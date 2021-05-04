@@ -33,6 +33,12 @@ class App {
     this.router.get('/private/order/:orderId([0-9]+)/delete/', (req, res) => res.render('order/private-delete'))
     this.router.get('/private/order/delete/finish/', (req, res) => res.render('order/private-delete-finish'))
 
+    this.router.get('/private/question/', (req, res) => res.render('question/private-index'))
+    this.router.get('/private/question/:questionId([0-9]+)/', (req, res) => res.render('question/private-view'))
+    this.router.get('/private/question/:questionId([0-9]+)/print/', (req, res) => res.render('question/private-print'))
+    this.router.get('/private/question/:questionId([0-9]+)/delete/', (req, res) => res.render('question/private-delete'))
+    this.router.get('/private/question/delete/finish/', (req, res) => res.render('question/private-delete-finish'))
+
     this.router.use(this.onNotFound.bind(this))
     this.router.use(this.onInternalServerError.bind(this))
   }

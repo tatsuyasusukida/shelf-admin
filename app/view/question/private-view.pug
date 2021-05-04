@@ -2,7 +2,7 @@ extends ../layout/private
 include ../mixin/product-item
 
 block title
-  title 注文の詳細｜オーダーメイド本棚管理システム（デモ）
+  title お問い合わせの詳細｜オーダーメイド本棚管理システム（デモ）
 
 block breadcrumb
   nav.mt-3(aria-label='パンくずリスト')
@@ -11,14 +11,14 @@ block breadcrumb
         li.breadcrumb-item
           a(href='../../') ホーム
         li.breadcrumb-item
-          a(href='../') 注文
+          a(href='../') お問い合わせ
         li.breadcrumb-item
           a(href='./' aria-current='page') 詳細
 
 block main
   main
     .container-fluid
-      h1 注文の詳細
+      h1 お問い合わせの詳細
       nav.mt-3(aria-label='メニュー')
         .d-flex.flex-wrap.gap-2
           a.btn.btn-outline-secondary(href='../') 戻る
@@ -30,20 +30,23 @@ block main
         nav(aria-label='目次')
           ul.list-unstyled
             li
-              a(href='#order') 注文について
+              a(href='#order') お問い合わせについて
             li
               a(href='#list') 商品の内訳
             li
-              a(href='#product1') 商品1の詳細
+              a(href='#product1') 商品1について
 
       section.mt-3(id='order')
-        h2 注文について
+        h2 お問い合わせについて
         dl.mb-0
-          dt 注文日時
+          dt お問い合わせ日時
           dd 2021年5月4日(火) 9時0分0秒
 
-          dt 注文番号
+          dt お問い合わせ番号
           dd 1111-2222-3333
+
+          dt お問い合わせの種類
+          dd 商品について
 
           dt お名前
           dd ここにお名前が入ります
@@ -66,15 +69,12 @@ block main
           dt メールアドレス
           dd demo@loremipsum.co.jp
 
-          dt 備考
+          dt お問い合わせの内容
           dd
             p.mb-0.
               ここに本文が入ります。<br>
               ここに本文が入ります。<br>
               ここに本文が入ります。
-
-          dt クレジットカード
-          dd.mb-0 お支払い方法
 
       section.mt-3(id='list')
         h2 商品の内訳
@@ -94,12 +94,6 @@ block main
               td 20,000円
 
         dl
-          dt 送料
-          dd 1,000円
-
-          dt 代引手数料
-          dd 500円
-
           dt 小計金額（税抜）
           dd 21,500円
 
@@ -113,5 +107,5 @@ block main
           dd 1台
 
       section.mt-3(id='product1')
-        h2 商品1の詳細
+        h2 商品1について
         +product-item
