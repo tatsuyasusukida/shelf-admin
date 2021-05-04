@@ -1,0 +1,14 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "render": "node script/render.js",
+    "build": "mkdir -p dist && asciidoctor -a stylesheet=style.css -o dist/requirement.html requirement.adoc"
+  },
+  "dependencies": {
+    "fs-extra": "^10.0.0",
+    "puppeteer": "^9.1.0"
+  }
+}
