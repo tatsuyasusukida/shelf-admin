@@ -39,6 +39,12 @@ class App {
     this.router.get('/private/question/:questionId([0-9]+)/delete/', (req, res) => res.render('question/private-delete'))
     this.router.get('/private/question/delete/finish/', (req, res) => res.render('question/private-delete-finish'))
 
+    this.router.get('/private/estimate/', (req, res) => res.render('estimate/private-index'))
+    this.router.get('/private/estimate/:estimateId([0-9]+)/', (req, res) => res.render('estimate/private-view'))
+    this.router.get('/private/estimate/:estimateId([0-9]+)/print/', (req, res) => res.render('estimate/private-print'))
+    this.router.get('/private/estimate/:estimateId([0-9]+)/delete/', (req, res) => res.render('estimate/private-delete'))
+    this.router.get('/private/estimate/delete/finish/', (req, res) => res.render('estimate/private-delete-finish'))
+
     this.router.use(this.onNotFound.bind(this))
     this.router.use(this.onInternalServerError.bind(this))
   }

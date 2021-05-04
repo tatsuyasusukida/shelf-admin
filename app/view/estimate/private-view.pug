@@ -1,0 +1,89 @@
+extends ../layout/private
+include ../mixin/product-item
+
+block title
+  title 見積書発行履歴の詳細｜オーダーメイド本棚管理システム（デモ）
+
+block breadcrumb
+  nav.mt-3(aria-label='パンくずリスト')
+    .container-fluid
+      ol.breadcrumb
+        li.breadcrumb-item
+          a(href='../../') ホーム
+        li.breadcrumb-item
+          a(href='../') 見積書発行履歴
+        li.breadcrumb-item
+          a(href='./' aria-current='page') 詳細
+
+block main
+  main
+    .container-fluid
+      h1 見積書発行履歴の詳細
+      nav.mt-3(aria-label='メニュー')
+        .d-flex.flex-wrap.gap-2
+          a.btn.btn-outline-secondary(href='../') 戻る
+          a.btn.btn-outline-primary(href='./print/' target='_blank') 見積書を印刷する
+          a.btn.btn-outline-danger(href='./delete/') 削除
+
+      section.mt-3
+        h2 目次
+        nav(aria-label='目次')
+          ul.list-unstyled
+            li
+              a(href='#order') 見積書発行履歴について
+            li
+              a(href='#list') 商品の内訳
+            li
+              a(href='#product1') 商品1について
+
+      section.mt-3(id='order')
+        h2 見積書発行履歴について
+        dl.mb-0
+          dt 発行日時
+          dd 2021年5月4日(火) 9時0分0秒
+
+          dt 見積書番号
+          dd 1111-2222-3333
+
+          dt 宛名
+          dd 株式会社ロレムイプサム 御中
+
+          dt 当社からのメール連絡
+          dd 希望する
+
+          dt メールアドレス
+          dd demo@loremipsum.co.jp
+
+      section.mt-3(id='list')
+        h2 商品の内訳
+
+        table.table
+          thead
+            tr
+              th 品名
+              th 単価
+              th 数量
+              th 金額
+          tbody
+            tr
+              td 商品1
+              td 20,000円
+              td 1台
+              td 20,000円
+
+        dl
+          dt 小計金額（税抜）
+          dd 21,500円
+
+          dt 消費税（10％）
+          dd 2,150円
+
+          dt 合計金額（税込）
+          dd 23,650円
+
+          dt 合計数量
+          dd 1台
+
+      section.mt-3(id='product1')
+        h2 商品1について
+        +product-item

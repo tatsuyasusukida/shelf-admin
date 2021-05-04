@@ -1,0 +1,17 @@
+extends ../layout/print
+include ../mixin/estimate
+include ../mixin/requirement
+
+block main
+  main
+    .container-a4
+      nav(aria-label='メニュー')
+        .d-print-none
+          .mt-3.mb-3.text-end
+            button.px-3(type='button') 印刷
+      .paper.is-first
+        +estimate
+      .mb-3.d-print-none
+      .paper
+        +requirement
+      .mb-3.d-print-none
