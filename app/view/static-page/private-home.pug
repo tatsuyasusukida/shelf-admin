@@ -1,0 +1,21 @@
+extends ../layout/private
+
+block title
+  title ホーム｜オーダーメイド本棚管理システム（デモ）
+
+block breadcrumb
+  nav.mt-3(aria-label='パンくずリスト')
+    .container-fluid
+      ol.breadcrumb
+        li.breadcrumb-item
+          a(href='./' aria-current='page') ホーム
+
+block main
+  main
+    .container-fluid
+      h1 ホーム
+      nav.mt-3(aria-label='メイン')
+        .d-grid.gap-2
+          a.btn.btn-outline-primary(href='./order/') 注文の一覧
+          a.btn.btn-outline-primary(href='./question/') お問い合わせの一覧
+          a.btn.btn-outline-primary(href='./estimate/') 見積依頼の一覧

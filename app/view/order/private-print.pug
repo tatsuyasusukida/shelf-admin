@@ -1,0 +1,54 @@
+extends ../layout/print
+
+block main
+  main
+    .container-a4
+      nav(aria-label='メニュー')
+        .d-print-none
+          .mt-3.mb-3.text-end
+            button.px-3(type='button') 印刷
+      .paper.is-first
+        .requirement
+          .requirement-header
+            .requirement-header-title 仕様書｜オーダーメイド本棚
+            .requirement-header-page Page 1/1
+          .requirement-body
+            .requirement-image
+              .requirement-image-front
+                figure
+                  .skeleton-image
+                  figcaption 正面画像
+              .requirement-image-side
+                figure
+                  .skeleton-image
+                  figcaption 側面画像
+            .requirement-table
+              table
+                tbody
+                  tr
+                    th W(幅)
+                    td 90cm
+                  tr
+                    th H(高さ)
+                    td 200cm
+                  tr
+                    th D(奥行)
+                    td 46cm
+                  tr
+                    th 棚板の枚数
+                    td 5枚
+                  tr
+                    th 棚板の厚さ
+                    td 17mm
+                  tr
+                    th 棚板の取り付け
+                    td ビス（固定）
+                  tr
+                    th 背面の有無
+                    td なし
+                  tr
+                    th カラー
+                    td ナチュラル
+          .requirement-footer &copy; 株式会社ロレムイプサム
+
+      .mb-3.d-print-none

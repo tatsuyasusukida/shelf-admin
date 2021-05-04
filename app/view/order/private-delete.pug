@@ -1,0 +1,33 @@
+extends ../layout/private
+include ../mixin/product-item
+
+block title
+  title 注文の削除｜オーダーメイド本棚管理システム（デモ）
+
+block breadcrumb
+  nav.mt-3(aria-label='パンくずリスト')
+    .container-fluid
+      ol.breadcrumb
+        li.breadcrumb-item
+          a(href='../../../') ホーム
+        li.breadcrumb-item
+          a(href='../../') 注文
+        li.breadcrumb-item
+          a(href='../') 詳細
+        li.breadcrumb-item
+          a(href='./' aria-current='page') 削除
+
+block main
+  main
+    .container-fluid
+      h1 注文の削除
+      nav.mt-3(aria-label='メニュー')
+        .d-flex.flex-wrap.gap-2
+          a.btn.btn-outline-secondary(href='../') 戻る
+
+      p.mt-3 注文を削除してもよろしいですか?
+
+      form(role='form')
+        .d-grid.gap-2
+          a.btn.btn-danger(href='../../delete/finish/') 削除
+          a.btn.btn-secondary(href='../') キャンセル

@@ -1,0 +1,79 @@
+extends ../layout/private
+include ../mixin/product-item
+
+block title
+  title 注文の詳細｜オーダーメイド本棚管理システム（デモ）
+
+block breadcrumb
+  nav.mt-3(aria-label='パンくずリスト')
+    .container-fluid
+      ol.breadcrumb
+        li.breadcrumb-item
+          a(href='../../') ホーム
+        li.breadcrumb-item
+          a(href='../') 注文
+        li.breadcrumb-item
+          a(href='./' aria-current='page') 詳細
+
+block main
+  main
+    .container-fluid
+      h1 注文の詳細
+      nav.mt-3(aria-label='メニュー')
+        .d-flex.flex-wrap.gap-2
+          a.btn.btn-outline-secondary(href='../') 戻る
+          a.btn.btn-outline-primary(href='./print/' target='_blank') 仕様書を印刷する
+          a.btn.btn-outline-danger(href='./delete/') 削除
+
+      section.mt-3
+        h2 目次
+        nav(aria-label='目次')
+          ul.list-unstyled
+            li
+              a(href='#order') 注文について
+            li
+              a(href='#product1') 商品1について
+
+      section.mt-3(id='order')
+        h2 注文について
+        dl.mb-0
+          dt 注文日時
+          dd 2021年5月4日(火) 9時0分0秒
+
+          dt 注文番号
+          dd 1111-2222-3333
+
+          dt お名前
+          dd ここにお名前が入ります
+
+          dt フリガナ
+          dd ここにフリガナが入ります
+
+          dt 会社名
+          dd 株式会社ロレムイプサム
+
+          dt 郵便番号
+          dd 9402039
+
+          dt 住所
+          dd 新潟県長岡市関原南4-3934
+
+          dt 電話番号
+          dd 0258945233
+
+          dt メールアドレス
+          dd demo@loremipsum.co.jp
+
+          dt 備考
+          dd
+            p.mb-0.
+              ここに本文が入ります。<br>
+              ここに本文が入ります。<br>
+              ここに本文が入ります。
+
+          dt クレジットカード
+          dd.mb-0 お支払い方法
+
+      section.mt-3(id='product1')
+        h2 商品1について
+        +product-item

@@ -1,0 +1,28 @@
+extends ../layout/private
+include ../mixin/product-item
+
+block title
+  title 注文の削除完了｜オーダーメイド本棚管理システム（デモ）
+
+block breadcrumb
+  nav.mt-3(aria-label='パンくずリスト')
+    .container-fluid
+      ol.breadcrumb
+        li.breadcrumb-item
+          a(href='../../../') ホーム
+        li.breadcrumb-item
+          a(href='../../') 注文
+        li.breadcrumb-item 詳細
+        li.breadcrumb-item 削除
+        li.breadcrumb-item 完了
+
+block main
+  main
+    .container-fluid
+      h1 注文の削除完了
+
+      p.mt-3 注文の削除が完了しました。
+
+      nav(aria-label='メイン')
+        .d-grid
+          a.btn.btn-success(href='../../') 一覧を表示する
