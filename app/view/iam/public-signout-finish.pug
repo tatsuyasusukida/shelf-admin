@@ -1,0 +1,24 @@
+extends ../layout/public
+include ../mixin/product-item
+
+block title
+  title ログアウト完了｜オーダーメイド本棚管理システム（デモ）
+
+block breadcrumb
+  nav.mt-3(aria-label='パンくずリスト')
+    .container-fluid
+      ol.breadcrumb
+        li.breadcrumb-item ホーム
+        li.breadcrumb-item ログアウト
+        li.breadcrumb-item 完了
+
+block main
+  main
+    .container-fluid
+      h1 ログアウト完了
+
+      p.mt-3 システムからログアウトしました。
+
+      nav(aria-label='メイン')
+        .d-grid
+          a.btn.btn-success(href='../../../../') トップページを表示する

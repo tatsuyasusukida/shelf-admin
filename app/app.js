@@ -25,7 +25,10 @@ class App {
     this.router.use(this.onRequestInitialize.bind(this))
     this.router.use('/static/', express.static(path.join(__dirname, 'static')))
 
-    this.router.get('/', (req, res) => res.redirect('./private/'))
+    this.router.get('/', (req, res) => res.render('static-page/public-home'))
+    this.router.get('/public/iam/signin/', (req, res) => res.render('iam/public-signin'))
+    this.router.get('/public/iam/signout/finish/', (req, res) => res.render('iam/public-signout-finish'))
+
     this.router.get('/private/', (req, res) => res.render('static-page/private-home'))
     this.router.get('/private/order/', (req, res) => res.render('order/private-index'))
     this.router.get('/private/order/:orderId([0-9]+)/', (req, res) => res.render('order/private-view'))
@@ -44,6 +47,8 @@ class App {
     this.router.get('/private/estimate/:estimateId([0-9]+)/print/', (req, res) => res.render('estimate/private-print'))
     this.router.get('/private/estimate/:estimateId([0-9]+)/delete/', (req, res) => res.render('estimate/private-delete'))
     this.router.get('/private/estimate/delete/finish/', (req, res) => res.render('estimate/private-delete-finish'))
+
+    this.router.get('/private/iam/signout/', (req, res) => res.render('iam/private-signout'))
 
     this.router.use(this.onNotFound.bind(this))
     this.router.use(this.onInternalServerError.bind(this))

@@ -1,0 +1,20 @@
+extends ../layout/public
+
+block title
+  title オーダーメイド本棚管理システム（デモ）
+
+block breadcrumb
+  nav.mt-3(aria-label='パンくずリスト')
+    .container-fluid
+      ol.breadcrumb
+        li.breadcrumb-item
+          a(href='./' aria-current='page') トップ
+
+block main
+  main
+    .container-fluid
+      h1 オーダーメイド本棚管理システム
+
+      nav.mt-3(aria-label='メイン')
+        .d-grid
+          a.btn.btn-primary(href='./public/iam/signin/') システムにログインする
