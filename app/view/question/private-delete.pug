@@ -28,6 +28,10 @@ block main
       p.mt-3 お問い合わせを削除してもよろしいですか?
 
       form(role='form')
-        .d-grid.gap-2
-          a.btn.btn-danger(href='../../delete/finish/') 削除
-          a.btn.btn-secondary(href='../') キャンセル
+        .row
+          .col
+            .d-grid
+              a.btn.btn-danger(href='../../delete/finish/') 削除
+          .col.order-first
+            .d-grid
+              a.btn.btn-link(href='../') キャンセル

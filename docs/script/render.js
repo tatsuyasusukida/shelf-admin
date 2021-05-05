@@ -9,7 +9,7 @@ class Main {
     try {
       const page = await browser.newPage()
 
-      await page.setViewport({width: 800, height: 1000, deviceScaleFactor: 2})
+      await page.setViewport({width: 800, height: 1050, deviceScaleFactor: 2})
 
       const items = this.getItems()
 
@@ -29,9 +29,13 @@ class Main {
 
   getItems () {
     return [
-      {pathname: '/list/', file: 'list'},
+      {pathname: '/', file: 'static-page/public-home'},
+      {pathname: '/public/layout/', file: 'static-page/public-layout'},
+      {pathname: '/public/iam/signin/', file: 'iam/public-signin'},
+      {pathname: '/public/iam/signout/finish/', file: 'iam/public-signout-finish'},
 
       {pathname: '/private/', file: 'static-page/private-home'},
+      {pathname: '/private/layout/', file: 'static-page/private-layout'},
       {pathname: '/private/order/', file: 'order/private-index'},
       {pathname: '/private/order/1/', file: 'order/private-view'},
       {pathname: '/private/order/1/print/', file: 'order/private-print'},
@@ -49,6 +53,8 @@ class Main {
       {pathname: '/private/estimate/1/print/', file: 'estimate/private-print'},
       {pathname: '/private/estimate/1/delete/', file: 'estimate/private-delete'},
       {pathname: '/private/estimate/delete/finish/', file: 'estimate/private-delete-finish'},
+
+      {pathname: '/private/iam/signout/', file: 'iam/private-signout'},
     ]
   }
 }
