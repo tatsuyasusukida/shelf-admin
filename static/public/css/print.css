@@ -195,6 +195,18 @@
   width: 30mm;
 }
 
+.estimate-table td.is-amount {
+  text-align: right;
+}
+
+.estimate-table td.is-price {
+  text-align: right;
+}
+
+.estimate-table td.is-total {
+  text-align: right;
+}
+
 .estimate-table td.is-blank {
   border: 0;
 }
