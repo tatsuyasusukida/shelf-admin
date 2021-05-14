@@ -1,6 +1,7 @@
 const model = require('../model')
 const winston = require('winston')
 const {LoggerMaker} = require('../util/logger-maker')
+const fixture = require('../test/fixture')
 
 class Main {
   async run () {
@@ -15,6 +16,7 @@ class Main {
       winston.loggers.add('query', loggerMaker.makeLogger('info', 'json', 'fixture-query.log'))
 
       await model.sequelize.sync({force: true})
+      await fixture()
     } finally {
       model.sequelize.close()
     }

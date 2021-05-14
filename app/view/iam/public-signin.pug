@@ -1,25 +1,30 @@
 extends ../layout/public
-include ../mixin/product-item
 
 block title
   title ログイン｜オーダーメイド本棚管理システム（デモ）
 
-block body
+block breadcrumb
+  nav.mt-3(aria-label='パンくずリスト')
+    .container-fluid
+      ol.breadcrumb
+        li.breadcrumb-item
+          a(href='../../../') トップ
+        li.breadcrumb-item
+          a(href='./' aria-current='page') ログイン
+
+block main
   main
-    .cointainer-fluid
-      .row.justify-content-center
-        .col-sm-8.col-md-6
-          h1.mt-3 ログイン
-          form(role='form')
-            .form-group.mb-3
-              label.form-label(for='email') メールアドレス
-              input.form-control(type='email' name='email' id='email' aria-required='true')
-            .form-group.mb-3
-              label.form-label(for='password') パスワード
-              .input-group
-                input.form-control(type='password' name='password' id='password' aria-required='true' aria-describedby='numberHelp')
-                button.btn.btn-outline-secondary(type='button' aria-label='パスワードを表示する') 表示
-              .form-text
-                a(href='#') パスワードをお忘れですか？
-            .d-grid
-              a.btn.btn-primary(href='../../../private/') ログイン
+    #main
+    //- .container-fluid
+    //-   h1.mt-3 ログイン
+    //-   form(role='form')
+    //-     .form-group.mb-3
+    //-       label.form-label(for='email') メールアドレス
+    //-       input.form-control(type='email' name='email' id='email' aria-required='true')
+    //-     .form-group.mb-3
+    //-       label.form-label(for='password') パスワード
+    //-       .input-group
+    //-         input.form-control(type='password' name='password' id='password' aria-required='true')
+    //-         button.btn.btn-outline-secondary(type='button' aria-label='パスワードを表示する') 表示
+    //-     .d-grid
+    //-       a.btn.btn-primary(href='../../../private/') ログイン

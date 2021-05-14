@@ -1,5 +1,4 @@
 extends ../layout/private
-include ../mixin/product-item
 
 block title
   title ログアウト｜オーダーメイド本棚管理システム（デモ）
@@ -15,19 +14,4 @@ block breadcrumb
 
 block main
   main
-    .container-fluid
-      h1 ログアウト
-      nav.mt-3(aria-label='メニュー')
-        .d-flex.flex-wrap.gap-2
-          a.btn.btn-outline-secondary(href='../../') 戻る
-
-      p.mt-3 ログアウトしてもよろしいですか？
-
-      form(role='form')
-        .row
-          .col
-            .d-grid
-              a.btn.btn-primary(href='../../../public/iam/signout/finish/') ログアウト
-          .col.order-first
-            .d-grid
-              a.btn.btn-link(href='../../') キャンセル
+    #main

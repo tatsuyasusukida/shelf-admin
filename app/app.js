@@ -8,10 +8,16 @@ const express = require('express')
 const session = require('express-session')
 const proxyMiddleware = require('proxy-middleware')
 const MySQLStore = require('express-mysql-session')(session)
+const {Validator} = require('./lib/validator')
+const {Initializer} = require('./lib/initializer')
 const model = require('./model')
+const {Op} = require('sequelize')
 
 class App {
   constructor () {
+    this.validator = new Validator()
+    this.initializer = new Initializer()
+
     this.session = session({
       cookie: {
         path: '/',
@@ -62,6 +68,8 @@ class App {
     this.router.get('/public/iam/signin/', (req, res) => res.render('iam/public-signin'))
     this.router.get('/public/iam/signout/finish/', (req, res) => res.render('iam/public-signout-finish'))
 
+    this.router.use('/private/', this.session)
+    this.router.use('/private/', this.onRequestAuthenticate.bind(this))
     this.router.get('/private/', (req, res) => res.render('static-page/private-home'))
     this.router.get('/private/layout/', (req, res) => res.render('static-page/private-layout'))
     this.router.get('/private/order/', (req, res) => res.render('order/private-index'))
@@ -86,6 +94,12 @@ class App {
 
     this.router.use('/api/v1/', nocache())
     this.router.use('/api/v1/', express.json())
+    this.router.get('/api/v1/public/iam/signin/initialize', this.onRequestApiV1PublicIamSigninInitialize.bind(this))
+    this.router.put('/api/v1/public/iam/signin/validate', this.onRequestApiV1PublicIamSigninValidate.bind(this))
+    this.router.put('/api/v1/public/iam/signin/submit', this.session, this.onRequestApiV1PublicIamSigninSubmit.bind(this))
+    this.router.use('/api/v1/private/', this.session)
+    this.router.use('/api/v1/private/', this.onRequestAuthenticateApi.bind(this))
+    this.router.delete('/api/v1/private/iam/signout/submit', this.onRequestApiV1PrivateIamSignoutSubmit.bind(this))
 
     this.router.use(this.onNotFound.bind(this))
     this.router.use(this.onInternalServerError.bind(this))
@@ -100,9 +114,117 @@ class App {
   }
 
   onRequestInitialize (req, res, next) {
+    req.locals = {}
     res.locals.env = process.env
 
     next()
+  }
+
+  async onRequestAuthenticate (req, res, next) {
+    try {
+      const admin = await this.authenticate(req)
+
+      if (admin) {
+        req.locals.admin = admin
+        next()
+      } else {
+        res.redirect('/public/iam/signin/')
+      }
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async onRequestAuthenticateApi (req, res, next) {
+    try {
+      const admin = await this.authenticate(req)
+
+      if (admin) {
+        req.locals.admin = admin
+        next()
+      } else {
+        res.status(401).end()
+      }
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async authenticate (req) {
+    const {adminId} = req.session
+
+    if (adminId) {
+      const admin = await model.admin.findOne({
+        where: {
+          id: {[Op.eq]: adminId},
+        },
+      })
+
+      if (admin) {
+        return admin
+      }
+    }
+
+    return null
+  }
+
+  async onRequestApiV1PublicIamSigninInitialize (req, res, next) {
+    try {
+      const form = this.initializer.makeFormIamSignin()
+      const validation = this.validator.makeValidationIamSignin()
+
+      res.send({form, validation})
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async onRequestApiV1PublicIamSigninValidate (req, res, next) {
+    try {
+      const validation = await this.validator.validateIamSignin(req)
+
+      res.send({validation})
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async onRequestApiV1PublicIamSigninSubmit (req, res, next) {
+    try {
+      const validation = await this.validator.validateIamSignin(req)
+
+      if (!validation.ok) {
+        res.status(400).end()
+        return
+      }
+
+      const admin = await model.admin.findOne({
+        where: {
+          username: {[Op.eq]: req.body.form.username},
+        },
+      })
+
+      const ok = true
+      const redirect = '../../../private/'
+
+      req.session.adminId = admin.id
+      res.send({ok, redirect})
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async onRequestApiV1PrivateIamSignoutSubmit (req, res, next) {
+    try {
+      req.session.destroy()
+
+      const ok = true
+      const redirect = '../../../public/iam/signout/finish/'
+
+      res.send({ok, redirect})
+    } catch (err) {
+      next(err)
+    }
   }
 
   onNotFound (req, res) {
