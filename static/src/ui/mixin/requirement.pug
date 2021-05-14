@@ -1,0 +1,43 @@
+mixin requirement
+  .requirement
+    .requirement-header
+      .requirement-header-title 仕様書｜オーダーメイド本棚
+      .requirement-header-page {{product.number}}/{{products.length}} ページ
+    .requirement-body
+      .requirement-image
+        .requirement-image-front
+          figure
+            img.w-100(v-bind:src='product.image.front' alt='正面画像')
+            figcaption 正面画像
+        .requirement-image-side
+          figure
+            img.w-100(v-bind:src='product.image.side' alt='側面画像')
+            figcaption 側面画像
+      .requirement-table
+        table
+          tbody
+            tr
+              th W(幅)
+              td {{product.width}}cm
+            tr
+              th H(高さ)
+              td {{product.height}}cm
+            tr
+              th D(奥行)
+              td {{product.depth}}cm
+            tr
+              th 棚板の枚数
+              td {{product.row}}枚
+            tr
+              th 棚板の厚さ
+              td {{product.thickness}}mm
+            tr
+              th 棚板の取り付け
+              td {{product.fix}}
+            tr
+              th 背面の有無
+              td {{product.back}}
+            tr
+              th カラー
+              td {{product.color}}
+    .requirement-footer 株式会社ロレムイプサム

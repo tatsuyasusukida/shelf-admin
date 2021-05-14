@@ -1,0 +1,60 @@
+mixin estimate
+  .estimate
+    .estimate-date {{estimate.dateText}}
+    .estimate-number 見積番号：{{estimate.number}}
+    .estimate-header 見積書
+    .row
+      .col
+        .estimate-left
+          .estimate-customer {{estimate.name}} {{estimate.title}}
+          .estimate-subject 件名：オーダーメイド本棚
+          .estimate-expiration 有効期限：発行日から1カ月間
+          .estimate-content 下記のとおりお見積申し上げます。
+          .estimate-total
+            .d-flex
+              .estimate-total-text お見積金額
+              .estimate-total-value.ms-auto &yen;{{summary.totalText}}-
+      .col
+        .estimate-right
+          .estimate-issuer 株式会社ロレムイプサム <br> 代表取締役　薄田達哉
+          .estimate-address 〒940-2039 <br> 新潟県長岡市関原南4丁目3934番地
+          .estimate-tel TEL：0258-94-5233
+          .estimate-fax FAX：0258-94-5541
+          .estimate-email E-mail：shelf@loremipsum.co.jp
+    .estimate-table
+      table
+        thead
+          tr
+            th.is-product 品番・品名
+            th.is-amount 数量
+            th.is-price 単価
+            th.is-total 金額
+        tbody
+          template(v-for='product of products')
+            tr
+              td.is-product オーダーメイド本棚｜別紙仕様書{{product.number}}ページ
+              td.is-amount {{product.amount}}台
+              td.is-price {{product.price.unitText}}
+              td.is-total {{product.price.totalText}}
+          template(v-for='i of (10 - products.length)')
+            tr
+              td.is-product &nbsp;
+              td.is-amount &nbsp;
+              td.is-price &nbsp;
+              td.is-total &nbsp;
+        tfoot
+          tr
+            td.is-blank &nbsp;
+            td(colspan='2') 小計
+            td.is-total {{summary.subtotalText}}
+          tr
+            td.is-blank &nbsp;
+            td(colspan='2') 消費税（10％）
+            td.is-total {{summary.taxText}}
+          tr
+            td.is-blank &nbsp;
+            td(colspan='2') 合計
+            td.is-total {{summary.totalText}}
+    .estimate-memo.
+      納入期限：注文日から約1カ月後 <br>
+      納入期限：別途打合せ

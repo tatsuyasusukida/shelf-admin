@@ -1,5 +1,6 @@
 import IamPublicSignin from './ui/iam/public-signin.vue'
 import IamPrivateSignout from './ui/iam/private-signout.vue'
+import OrderPrivatePrint from './ui/order/private-print.vue'
 
 class Main {
   async run () {
@@ -18,6 +19,8 @@ class Main {
       return IamPublicSignin
     } else if (new RegExp('^/private/iam/signout/$').test(pathname)) {
       return IamPrivateSignout
+    } else if (new RegExp('^/private/order/[0-9]+/print/$').test(pathname)) {
+      return OrderPrivatePrint
     } else {
       return null
     }

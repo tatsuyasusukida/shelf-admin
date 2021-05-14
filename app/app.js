@@ -111,6 +111,9 @@ class App {
     this.router.use('/api/v1/private/', this.onRequestAuthenticateApi.bind(this))
     this.router.delete('/api/v1/private/iam/signout/submit', this.onRequestApiV1PrivateIamSignoutSubmit.bind(this))
 
+    this.router.use('/api/v1/private/order/:orderId([0-9]+)/', this.onRequestFindOrder.bind(this))
+    this.router.get('/api/v1/private/order/:orderId([0-9]+)/print/initialize', this.onRequestApiV1PrivateOrderPrintInitialize.bind(this))
+
     this.router.use(this.onNotFound.bind(this))
     this.router.use(this.onInternalServerError.bind(this))
   }
@@ -322,6 +325,26 @@ class App {
       const redirect = '../../../public/iam/signout/finish/'
 
       res.send({ok, redirect})
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async onRequestApiV1PrivateOrderPrintInitialize (req, res, next) {
+    try {
+      const order = this.converter.convertOrder(req.locals.order)
+      const products = (await model.orderProduct.findAll({
+          where: {
+            orderId: {[Op.eq]: order.id},
+          },
+          order: [['sort', 'asc']],
+          include: [model.product]
+        }))
+        .map(({product}, i) => {
+          return this.converter.convertProduct(product, i + 1)
+        })
+
+      res.send({order, products})
     } catch (err) {
       next(err)
     }
