@@ -113,6 +113,7 @@ class App {
 
     this.router.use('/api/v1/private/order/:orderId([0-9]+)/', this.onRequestFindOrder.bind(this))
     this.router.get('/api/v1/private/order/:orderId([0-9]+)/print/initialize', this.onRequestApiV1PrivateOrderPrintInitialize.bind(this))
+    this.router.delete('/api/v1/private/order/:orderId([0-9]+)/delete/submit', this.onRequestApiV1PrivateOrderDeleteSubmit.bind(this))
 
     this.router.use(this.onNotFound.bind(this))
     this.router.use(this.onInternalServerError.bind(this))
@@ -345,6 +346,19 @@ class App {
         })
 
       res.send({order, products})
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async onRequestApiV1PrivateOrderDeleteSubmit (req, res, next) {
+    try {
+      await req.locals.order.destroy()
+
+      const ok = true
+      const redirect = '../../delete/finish/'
+
+      res.send({ok, redirect})
     } catch (err) {
       next(err)
     }

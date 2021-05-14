@@ -1,6 +1,7 @@
 import IamPublicSignin from './ui/iam/public-signin.vue'
 import IamPrivateSignout from './ui/iam/private-signout.vue'
 import OrderPrivatePrint from './ui/order/private-print.vue'
+import OrderPrivateDelete from './ui/order/private-delete.vue'
 
 class Main {
   async run () {
@@ -21,6 +22,8 @@ class Main {
       return IamPrivateSignout
     } else if (new RegExp('^/private/order/[0-9]+/print/$').test(pathname)) {
       return OrderPrivatePrint
+    } else if (new RegExp('^/private/order/[0-9]+/delete/$').test(pathname)) {
+      return OrderPrivateDelete
     } else {
       return null
     }
