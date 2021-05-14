@@ -1,11 +1,11 @@
 <template lang="pug">
   .container-fluid
-    h1 注文の削除
+    h1 お問い合わせの削除
     nav.mt-3(aria-label='メニュー')
       .d-flex.flex-wrap.gap-2
         a.btn.btn-outline-secondary(href='../') 戻る
 
-    p.mt-3 注文を削除してもよろしいですか?
+    p.mt-3 お問い合わせを削除してもよろしいですか?
 
     form(role='form')
       .row

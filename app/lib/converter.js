@@ -28,6 +28,26 @@ class Converter {
     }
   }
 
+  convertQuestion (question) {
+    return {
+      id: question.id,
+      date: question.date,
+      dateText: this.convertDateTime(question.date),
+      number: question.number,
+      name: question.name,
+      kana: question.kana,
+      company: question.company,
+      zip: question.zip,
+      address: question.address,
+      tel: question.tel,
+      email: question.email,
+      content: question.content,
+      contentLines: this.splitText(question.content),
+      price: question.price,
+      priceText: this.formatNumber(question.price),
+    }
+  }
+
   convertProduct (product, number) {
     const image = this.imageMaker.makeImage(product)
     const price = this.priceCalculator.calculatePrice(product)

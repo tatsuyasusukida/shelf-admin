@@ -1,4 +1,5 @@
 extends ../layout/private
+include ../mixin/pagination
 
 block title
   title お問い合わせの一覧｜オーダーメイド本棚管理システム（デモ）
@@ -21,25 +22,20 @@ block main
           a.btn.btn-outline-secondary(href='../') 戻る
       form.mt-3(role='form')
         .input-group
-          input.form-control(type='search' name='keyword' id='keyword' placeholder='キーワード' aria-label='検索キーワード')
+          input.form-control(type='search' name='keyword' id='keyword' placeholder='キーワード' aria-label='検索キーワード' value=req.query.keyword || '')
           button.btn.btn-primary(type='submit') 検索
-      nav.mt-3(aria-label='メイン')
-        .list-group
-          each el, i in new Array(20)
-            a.list-group-item.list-group-item-action(href='./1/') 2021年5月4日(火) 9時0分0秒、株式会社ロレムイプサム様、税込22,000円
-      nav.mt-3(aria-label='ページ番号')
-        ul.pagination
-          li.page-item.disabled
-            a.page-link(href='./') 前のページ
-          li.page-item.active
-            a.page-link(href='./' aria-current='page') 1
-          li.page-item
-            a.page-link(href='./') 2
-          li.page-item
-            a.page-link(href='./') 3
-          li.page-item
-            a.page-link(href='./') 4
-          li.page-item
-            a.page-link(href='./') 5
-          li.page-item
-            a.page-link(href='./') 次のページ
+
+      if questions.length < 1
+        p.mt-3
+          if url.search === '' 
+            | お問い合わせが登録されていません。
+          if url.search !== '' 
+            | 検索結果は0件でした。
+      if questions.length >= 1
+        p.mt-3 全#{page.max}ページ中#{page.current}ページ目、#{page.start}件目から#{page.end}件目までを表示しています。
+        nav.mt-3(aria-label='メイン')
+          .list-group
+            each question in questions
+              a.list-group-item.list-group-item-action(href=`./${question.id}/`) #{question.dateText}、#{question.company || question.name}様、税込#{question.priceText}円
+
+        +pagination(pagination)

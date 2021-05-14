@@ -18,7 +18,7 @@ class SummaryMaker {
       return memo + parseInt(product.amount, 10)
     }, 0)
 
-    const summary = {
+    return {
       shipping,
       shippingText: this.converter.formatNumber(shipping),
       fee,
@@ -32,33 +32,29 @@ class SummaryMaker {
       amount,
       amountText: this.converter.formatNumber(amount),
     }
-
-    return summary
   }
 
-  async makeSummaryQuestion (req, transaction) {
-    const {cartId} = req.session
-    const cartProducts = await this.finder.findCartProducts(cartId)
-    const products = cartProducts.map(({product}, i) => {
-      return this.converter.convertProduct(product, i + 1)
-    })
-
+  async makeSummaryQuestion (question, products) {
     const subtotal = products.reduce((memo, product) => {
       return memo + product.price.total
     }, 0)
 
     const tax = Math.floor(subtotal * process.env.TAX_PERCENT / 100)
     const total = subtotal + tax
-    const summary = {
+    const amount = products.reduce((memo, product) => {
+      return memo + parseInt(product.amount, 10)
+    }, 0)
+
+    return {
       subtotal,
       subtotalText: this.converter.formatNumber(subtotal),
       tax,
       taxText: this.converter.formatNumber(tax),
       total,
       totalText: this.converter.formatNumber(total),
+      amount,
+      amountText: this.converter.formatNumber(amount),
     }
-
-    return {products, summary}
   }
 }
 

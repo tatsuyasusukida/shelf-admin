@@ -30,51 +30,53 @@ block main
         nav(aria-label='目次')
           ul.list-unstyled
             li
-              a(href='#order') お問い合わせについて
+              a(href='#question') お問い合わせについて
             li
               a(href='#list') 商品の内訳
-            li
-              a(href='#product1') 商品1について
+            each product of products
+              li
+                a(href='#product' + product.number) 商品#{product.number}の詳細
 
-      section.mt-3(id='order')
+      section.mt-3(id='question')
         h2 お問い合わせについて
         dl.mb-0
           dt お問い合わせ日時
-          dd 2021年5月4日(火) 9時0分0秒
+          dd #{question.dateText}
 
           dt お問い合わせ番号
-          dd 1111-2222-3333
+          dd #{question.number}
 
           dt お問い合わせの種類
-          dd 商品について
+          dd #{question.category}
 
           dt お名前
-          dd ここにお名前が入ります
+          dd #{question.name}
 
           dt フリガナ
-          dd ここにフリガナが入ります
+          dd #{question.kana}
 
           dt 会社名
-          dd 株式会社ロレムイプサム
+          dd #{question.company}
 
           dt 郵便番号
-          dd 9402039
+          dd #{question.zip}
 
           dt 住所
-          dd 新潟県長岡市関原南4-3934
+          dd #{question.address}
 
           dt 電話番号
-          dd 0258945233
+          dd #{question.tel}
 
           dt メールアドレス
-          dd shelf@loremipsum.co.jp
+          dd #{question.email}
 
           dt お問い合わせの内容
-          dd
-            p.mb-0.
-              ここにテキストが入ります。<br>
-              ここにテキストが入ります。<br>
-              ここにテキストが入ります。
+          dd.mb-0
+            p.mb-0
+              each line, i in question.contentLines
+                if i >= 1
+                  br
+                | #{line}
 
       section.mt-3(id='list')
         h2 商品の内訳
@@ -87,25 +89,27 @@ block main
               th 数量
               th 金額
           tbody
-            tr
-              td 商品1
-              td 20,000円
-              td 1台
-              td 20,000円
+            each product in products
+              tr
+                td 商品#{product.number}
+                td #{product.price.unitText}円
+                td #{product.amount}台
+                td #{product.price.totalText}円
 
         dl
           dt 小計金額（税抜）
-          dd 21,500円
+          dd #{summary.subtotalText}円
 
           dt 消費税（10％）
-          dd 2,150円
+          dd #{summary.taxText}円
 
           dt 合計金額（税込）
-          dd 23,650円
+          dd #{summary.totalText}円
 
           dt 合計数量
-          dd 1台
+          dd #{summary.amountText}台
 
-      section.mt-3(id='product1')
-        h2 商品1について
-        +product-item
+      each product of products
+        section.mt-3(id='product' + product.number)
+          h2 商品#{product.number}の詳細
+          +product-item(product)

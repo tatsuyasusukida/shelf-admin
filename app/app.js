@@ -88,7 +88,10 @@ class App {
     this.router.get('/private/order/:orderId([0-9]+)/delete/', (req, res) => res.render('order/private-delete'))
     this.router.get('/private/order/delete/finish/', (req, res) => res.render('order/private-delete-finish'))
 
+    this.router.get('/private/question/', this.onRequestPrivateQuestionIndex.bind(this))
     this.router.get('/private/question/', (req, res) => res.render('question/private-index'))
+    this.router.use('/private/question/:questionId([0-9]+)/', this.onRequestFindQuestion.bind(this))
+    this.router.get('/private/question/:questionId([0-9]+)/', this.onRequestPrivateQuestionView.bind(this))
     this.router.get('/private/question/:questionId([0-9]+)/', (req, res) => res.render('question/private-view'))
     this.router.get('/private/question/:questionId([0-9]+)/print/', (req, res) => res.render('question/private-print'))
     this.router.get('/private/question/:questionId([0-9]+)/delete/', (req, res) => res.render('question/private-delete'))
@@ -114,6 +117,10 @@ class App {
     this.router.use('/api/v1/private/order/:orderId([0-9]+)/', this.onRequestFindOrder.bind(this))
     this.router.get('/api/v1/private/order/:orderId([0-9]+)/print/initialize', this.onRequestApiV1PrivateOrderPrintInitialize.bind(this))
     this.router.delete('/api/v1/private/order/:orderId([0-9]+)/delete/submit', this.onRequestApiV1PrivateOrderDeleteSubmit.bind(this))
+
+    this.router.use('/api/v1/private/question/:questionId([0-9]+)/', this.onRequestFindQuestion.bind(this))
+    this.router.get('/api/v1/private/question/:questionId([0-9]+)/print/initialize', this.onRequestApiV1PrivateQuestionPrintInitialize.bind(this))
+    this.router.delete('/api/v1/private/question/:questionId([0-9]+)/delete/submit', this.onRequestApiV1PrivateQuestionDeleteSubmit.bind(this))
 
     this.router.use(this.onNotFound.bind(this))
     this.router.use(this.onInternalServerError.bind(this))
@@ -204,6 +211,26 @@ class App {
     }
   }
 
+  async onRequestFindQuestion (req, res, next) {
+    try {
+      const question = await model.question.findOne({
+        where: {
+          id: {[Op.eq]: req.params.questionId},
+        },
+      })
+
+      if (!question) {
+        res.status(404).end()
+        return
+      }
+
+      req.locals.question = question
+      next()
+    } catch (err) {
+      next(err)
+    }
+  }
+
   async onRequestPrivateOrderIndex (req, res, next) {
     try {
       const current = parseInt(req.query.page || '1', 10)
@@ -263,6 +290,74 @@ class App {
       const summary = await this.summaryMaker.makeSummaryOrder(...args)
 
       res.locals.order = order
+      res.locals.products = products
+      res.locals.summary = summary
+
+      next()
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async onRequestPrivateQuestionIndex (req, res, next) {
+    try {
+      const current = parseInt(req.query.page || '1', 10)
+      const limit = 20
+      const offset = limit * (current - 1)
+      let where = {}
+
+      if (req.query.keyword) {
+        where = {
+          [Op.or]: {
+            number: {[Op.like]: `%${req.query.keyword}%`},
+            name: {[Op.like]: `%${req.query.keyword}%`},
+            kana: {[Op.like]: `%${req.query.keyword}%`},
+            company: {[Op.like]: `%${req.query.keyword}%`},
+          },
+        }
+      }
+
+      const questions = (await model.question.findAll({
+          where,
+          question: [['date', 'desc']],
+          limit,
+          offset,
+        }))
+        .map(question => {
+          return this.converter.convertQuestion(question)
+        })
+
+      const count = (await model.question.count({where}))
+      const page = this.paginator.makePage(count, limit, current)
+      const pagination = this.paginator.makePagination(req.query, page)
+
+      res.locals.questions = questions
+      res.locals.page = page
+      res.locals.pagination = pagination
+      next()
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async onRequestPrivateQuestionView (req, res, next) {
+    try {
+      const question = this.converter.convertQuestion(req.locals.question)
+      const products = (await model.questionProduct.findAll({
+          where: {
+            questionId: {[Op.eq]: question.id},
+          },
+          question: [['sort', 'asc']],
+          include: [model.product]
+        }))
+        .map(({product}, i) => {
+          return this.converter.convertProduct(product, i + 1)
+        })
+
+      const args = [question, products]
+      const summary = await this.summaryMaker.makeSummaryQuestion(...args)
+
+      res.locals.question = question
       res.locals.products = products
       res.locals.summary = summary
 
@@ -354,6 +449,39 @@ class App {
   async onRequestApiV1PrivateOrderDeleteSubmit (req, res, next) {
     try {
       await req.locals.order.destroy()
+
+      const ok = true
+      const redirect = '../../delete/finish/'
+
+      res.send({ok, redirect})
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async onRequestApiV1PrivateQuestionPrintInitialize (req, res, next) {
+    try {
+      const question = this.converter.convertQuestion(req.locals.question)
+      const products = (await model.questionProduct.findAll({
+          where: {
+            questionId: {[Op.eq]: question.id},
+          },
+          question: [['sort', 'asc']],
+          include: [model.product]
+        }))
+        .map(({product}, i) => {
+          return this.converter.convertProduct(product, i + 1)
+        })
+
+      res.send({question, products})
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async onRequestApiV1PrivateQuestionDeleteSubmit (req, res, next) {
+    try {
+      await req.locals.question.destroy()
 
       const ok = true
       const redirect = '../../delete/finish/'
