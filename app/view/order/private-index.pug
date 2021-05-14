@@ -1,4 +1,5 @@
 extends ../layout/private
+include ../mixin/pagination
 
 block title
   title 注文の一覧｜オーダーメイド本棚管理システム（デモ）
@@ -23,23 +24,17 @@ block main
         .input-group
           input.form-control(type='search' name='keyword' id='keyword' placeholder='キーワード' aria-label='検索キーワード')
           button.btn.btn-primary(type='submit') 検索
-      nav.mt-3(aria-label='メイン')
-        .list-group
-          each el, i in new Array(20)
-            a.list-group-item.list-group-item-action(href='./1/') 2021年5月4日(火) 9時0分0秒、株式会社ロレムイプサム様、税込22,000円、クレジットカード
-      nav.mt-3(aria-label='ページ番号')
-        ul.pagination
-          li.page-item.disabled
-            a.page-link(href='./') 前のページ
-          li.page-item.active
-            a.page-link(href='./' aria-current='page') 1
-          li.page-item
-            a.page-link(href='./') 2
-          li.page-item
-            a.page-link(href='./') 3
-          li.page-item
-            a.page-link(href='./') 4
-          li.page-item
-            a.page-link(href='./') 5
-          li.page-item
-            a.page-link(href='./') 次のページ
+      if orders.length < 1
+        p.alert.alert-info.mt-3
+          if url.search === '' 
+            | 注文が登録されていません。
+          if url.search !== '' 
+            | 検索結果は0件でした。
+      if orders.length >= 1
+        p.mt-3 #{page.max}ページ中#{page.current}ページ目、#{page.start}件目から#{page.end}件目までを表示しています。
+        nav.mt-3(aria-label='メイン')
+          .list-group
+            each order in orders
+              a.list-group-item.list-group-item-action(href=`./${order.id}/`) #{order.dateText}、#{order.company || order.name}様、税込#{order.priceText}円、#{order.payment}
+
+        +pagination(pagination)

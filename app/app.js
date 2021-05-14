@@ -8,6 +8,8 @@ const express = require('express')
 const session = require('express-session')
 const proxyMiddleware = require('proxy-middleware')
 const MySQLStore = require('express-mysql-session')(session)
+const {Converter} = require('./lib/converter')
+const {Paginator} = require('./lib/paginator')
 const {Validator} = require('./lib/validator')
 const {Initializer} = require('./lib/initializer')
 const model = require('./model')
@@ -15,6 +17,8 @@ const {Op} = require('sequelize')
 
 class App {
   constructor () {
+    this.converter = new Converter()
+    this.paginator = new Paginator()
     this.validator = new Validator()
     this.initializer = new Initializer()
 
@@ -72,6 +76,8 @@ class App {
     this.router.use('/private/', this.onRequestAuthenticate.bind(this))
     this.router.get('/private/', (req, res) => res.render('static-page/private-home'))
     this.router.get('/private/layout/', (req, res) => res.render('static-page/private-layout'))
+
+    this.router.get('/private/order/', this.onRequestPrivateOrder.bind(this))
     this.router.get('/private/order/', (req, res) => res.render('order/private-index'))
     this.router.get('/private/order/:orderId([0-9]+)/', (req, res) => res.render('order/private-view'))
     this.router.get('/private/order/:orderId([0-9]+)/print/', (req, res) => res.render('order/private-print'))
@@ -116,6 +122,8 @@ class App {
   onRequestInitialize (req, res, next) {
     req.locals = {}
     res.locals.env = process.env
+    res.locals.req = req
+    res.locals.url = new URL(req.originalUrl, process.env.BASE_URL)
 
     next()
   }
@@ -166,6 +174,34 @@ class App {
     }
 
     return null
+  }
+
+  async onRequestPrivateOrder (req, res, next) {
+    try {
+      const current = parseInt(req.query.page || '1', 10)
+      const limit = 20
+      const offset = limit * (current - 1)
+
+      const orders = (await model.order.findAll({
+          order: [['date', 'desc']],
+          limit,
+          offset,
+        }))
+        .map(order => {
+          return this.converter.convertOrder(order)
+        })
+
+      const count = (await model.order.count({}))
+      const page = this.paginator.makePage(count, limit, current)
+      const pagination = this.paginator.makePagination(req.query, page)
+
+      res.locals.orders = orders
+      res.locals.page = page
+      res.locals.pagination = pagination
+      next()
+    } catch (err) {
+      next(err)
+    }
   }
 
   async onRequestApiV1PublicIamSigninInitialize (req, res, next) {
