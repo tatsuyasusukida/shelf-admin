@@ -12,6 +12,7 @@ const {Converter} = require('./lib/converter')
 const {Paginator} = require('./lib/paginator')
 const {Validator} = require('./lib/validator')
 const {Initializer} = require('./lib/initializer')
+const {SummaryMaker} = require('./lib/summary-maker')
 const model = require('./model')
 const {Op} = require('sequelize')
 
@@ -21,6 +22,7 @@ class App {
     this.paginator = new Paginator()
     this.validator = new Validator()
     this.initializer = new Initializer()
+    this.summaryMaker = new SummaryMaker()
 
     this.session = session({
       cookie: {
@@ -77,8 +79,10 @@ class App {
     this.router.get('/private/', (req, res) => res.render('static-page/private-home'))
     this.router.get('/private/layout/', (req, res) => res.render('static-page/private-layout'))
 
-    this.router.get('/private/order/', this.onRequestPrivateOrder.bind(this))
+    this.router.get('/private/order/', this.onRequestPrivateOrderIndex.bind(this))
     this.router.get('/private/order/', (req, res) => res.render('order/private-index'))
+    this.router.use('/private/order/:orderId([0-9]+)/', this.onRequestFindOrder.bind(this))
+    this.router.get('/private/order/:orderId([0-9]+)/', this.onRequestPrivateOrderView.bind(this))
     this.router.get('/private/order/:orderId([0-9]+)/', (req, res) => res.render('order/private-view'))
     this.router.get('/private/order/:orderId([0-9]+)/print/', (req, res) => res.render('order/private-print'))
     this.router.get('/private/order/:orderId([0-9]+)/delete/', (req, res) => res.render('order/private-delete'))
@@ -176,13 +180,46 @@ class App {
     return null
   }
 
-  async onRequestPrivateOrder (req, res, next) {
+  async onRequestFindOrder (req, res, next) {
+    try {
+      const order = await model.order.findOne({
+        where: {
+          id: {[Op.eq]: req.params.orderId},
+        },
+      })
+
+      if (!order) {
+        res.status(404).end()
+        return
+      }
+
+      req.locals.order = order
+      next()
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async onRequestPrivateOrderIndex (req, res, next) {
     try {
       const current = parseInt(req.query.page || '1', 10)
       const limit = 20
       const offset = limit * (current - 1)
+      let where = {}
+
+      if (req.query.keyword) {
+        where = {
+          [Op.or]: {
+            number: {[Op.like]: `%${req.query.keyword}%`},
+            name: {[Op.like]: `%${req.query.keyword}%`},
+            kana: {[Op.like]: `%${req.query.keyword}%`},
+            company: {[Op.like]: `%${req.query.keyword}%`},
+          },
+        }
+      }
 
       const orders = (await model.order.findAll({
+          where,
           order: [['date', 'desc']],
           limit,
           offset,
@@ -191,13 +228,40 @@ class App {
           return this.converter.convertOrder(order)
         })
 
-      const count = (await model.order.count({}))
+      const count = (await model.order.count({where}))
       const page = this.paginator.makePage(count, limit, current)
       const pagination = this.paginator.makePagination(req.query, page)
 
       res.locals.orders = orders
       res.locals.page = page
       res.locals.pagination = pagination
+      next()
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async onRequestPrivateOrderView (req, res, next) {
+    try {
+      const order = this.converter.convertOrder(req.locals.order)
+      const products = (await model.orderProduct.findAll({
+          where: {
+            orderId: {[Op.eq]: order.id},
+          },
+          order: [['sort', 'asc']],
+          include: [model.product]
+        }))
+        .map(({product}, i) => {
+          return this.converter.convertProduct(product, i + 1)
+        })
+
+      const args = [order, products]
+      const summary = await this.summaryMaker.makeSummaryOrder(...args)
+
+      res.locals.order = order
+      res.locals.products = products
+      res.locals.summary = summary
+
       next()
     } catch (err) {
       next(err)

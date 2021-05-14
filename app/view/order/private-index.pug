@@ -22,16 +22,16 @@ block main
           a.btn.btn-outline-secondary(href='../') 戻る
       form.mt-3(role='form')
         .input-group
-          input.form-control(type='search' name='keyword' id='keyword' placeholder='キーワード' aria-label='検索キーワード')
+          input.form-control(type='search' name='keyword' id='keyword' placeholder='キーワード' aria-label='検索キーワード' value=req.query.keyword || '')
           button.btn.btn-primary(type='submit') 検索
       if orders.length < 1
-        p.alert.alert-info.mt-3
+        p.mt-3
           if url.search === '' 
             | 注文が登録されていません。
           if url.search !== '' 
             | 検索結果は0件でした。
       if orders.length >= 1
-        p.mt-3 #{page.max}ページ中#{page.current}ページ目、#{page.start}件目から#{page.end}件目までを表示しています。
+        p.mt-3 全#{page.max}ページ中#{page.current}ページ目、#{page.start}件目から#{page.end}件目までを表示しています。
         nav.mt-3(aria-label='メイン')
           .list-group
             each order in orders

@@ -21,6 +21,7 @@ class Converter {
       tel: order.tel,
       email: order.email,
       memo: order.memo,
+      memoLines: this.splitText(order.memo),
       payment: order.payment,
       price: order.price,
       priceText: this.formatNumber(order.price),
@@ -56,6 +57,10 @@ class Converter {
       name: estimate.name,
       title: estimate.title,
     }
+  }
+
+  splitText (text) {
+    return text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n')
   }
 
   formatNumber (value) {

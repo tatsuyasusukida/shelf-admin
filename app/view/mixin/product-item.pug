@@ -1,46 +1,46 @@
-mixin product-item
-  .row.gx-3
+mixin product-item(product)
+  .row.gx-3.mt-3
     .col-12.col-sm-6
       .row.gx-3
         .col
           figure
-            .skeleton-image
+            img.w-100(src=product.image.front alt='正面画像')
             figcaption.text-center.mt-2 正面画像
         .col
           figure
-            .skeleton-image
+            img.w-100(src=product.image.side alt='側面画像')
             figcaption.text-center.mt-2 側面画像
     .col-12.col-sm-6
       dl.row.mb-0
         dt.col-6 W(幅)
-        dd.col-6 15cm
+        dd.col-6 #{product.width}
 
         dt.col-6 H(高さ)
-        dd.col-6 49cm
+        dd.col-6 #{product.height}
 
         dt.col-6 D(奥行)
-        dd.col-6 19cm
+        dd.col-6 #{product.depth}
 
         dt.col-6 棚板の枚数
-        dd.col-6 1枚
+        dd.col-6 #{product.row}
 
         dt.col-6 棚板の厚さ
-        dd.col-6 17mm
+        dd.col-6 #{product.thickness}
 
         dt.col-6 棚板の取り付け
-        dd.col-6 ビス（固定）
+        dd.col-6 #{product.fix}
 
         dt.col-6 背面の有無
-        dd.col-6 なし
+        dd.col-6 #{product.back}
 
         dt.col-6 カラー
-        dd.col-6 ナチュラル
+        dd.col-6 #{product.color}
 
         dt.col-6 数量
-        dd.col-6 1台
+        dd.col-6 #{product.amount}
 
         dt.col-6 単価
-        dd.col-6 20,000円
+        dd.col-6 #{product.price.unitText}円（税込）
 
         dt.col-6 金額
-        dd.col-6.mb-0 20,000円
+        dd.col-6.mb-0 #{product.price.totalText}円（税込）

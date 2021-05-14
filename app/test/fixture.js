@@ -28,4 +28,23 @@ module.exports = async function () {
     payment: 'クレジットカード',
     price: 22000,
   })
+
+  await model.product.create({
+    id: 1,
+    width: 15,
+    height: 49,
+    depth: 19,
+    row: 1,
+    thickness: 17,
+    fix: 'ビス（固定）',
+    back: 'なし',
+    color: 'ナチュラル',
+    amount: 1,
+  })
+
+  await model.orderProduct.create({
+    sort: 1,
+    orderId: 1,
+    productId: 1,
+  })
 }

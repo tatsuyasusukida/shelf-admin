@@ -33,48 +33,50 @@ block main
               a(href='#order') 注文について
             li
               a(href='#list') 商品の内訳
-            li
-              a(href='#product1') 商品1の詳細
+            each product of products
+              li
+                a(href='#product' + product.number) 商品#{product.number}の詳細
 
       section.mt-3(id='order')
         h2 注文について
         dl.mb-0
           dt 注文日時
-          dd 2021年5月4日(火) 9時0分0秒
+          dd #{order.dateText}
 
           dt 注文番号
-          dd 1111-2222-3333
+          dd #{order.number}
 
           dt お名前
-          dd ここにお名前が入ります
+          dd #{order.name}
 
           dt フリガナ
-          dd ここにフリガナが入ります
+          dd #{order.kana}
 
           dt 会社名
-          dd 株式会社ロレムイプサム
+          dd #{order.company}
 
           dt 郵便番号
-          dd 9402039
+          dd #{order.zip}
 
           dt 住所
-          dd 新潟県長岡市関原南4-3934
+          dd #{order.address}
 
           dt 電話番号
-          dd 0258945233
+          dd #{order.tel}
 
           dt メールアドレス
-          dd shelf@loremipsum.co.jp
+          dd #{order.email}
 
           dt 備考
           dd
-            p.mb-0.
-              ここにテキストが入ります。<br>
-              ここにテキストが入ります。<br>
-              ここにテキストが入ります。
+            p.mb-0
+              each line, i in order.memoLines
+                if i >= 1
+                  br
+                | #{line}
 
           dt お支払い方法
-          dd.mb-0 クジレットカード
+          dd.mb-0 #{order.payment}
 
       section.mt-3(id='list')
         h2 商品の内訳
@@ -87,31 +89,33 @@ block main
               th 数量
               th 金額
           tbody
-            tr
-              td 商品1
-              td 20,000円
-              td 1台
-              td 20,000円
+            each product in products
+              tr
+                td 商品#{product.number}
+                td #{product.price.unitText}円
+                td #{product.amount}台
+                td #{product.price.totalText}円
 
         dl
           dt 送料
-          dd 1,000円
+          dd #{summary.shippingText}円
 
           dt 代引手数料
-          dd 500円
+          dd #{summary.feeText}円
 
           dt 小計金額（税抜）
-          dd 21,500円
+          dd #{summary.subtotalText}円
 
           dt 消費税（10％）
-          dd 2,150円
+          dd #{summary.taxText}円
 
           dt 合計金額（税込）
-          dd 23,650円
+          dd #{summary.totalText}円
 
           dt 合計数量
-          dd 1台
+          dd #{summary.amountText}台
 
-      section.mt-3(id='product1')
-        h2 商品1の詳細
-        +product-item
+      each product of products
+        section.mt-3(id='product' + product.number)
+          h2 商品#{product.number}の詳細
+          +product-item(product)
