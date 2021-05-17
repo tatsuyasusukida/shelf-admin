@@ -48,6 +48,17 @@ module.exports = async function () {
     price: 22000,
   })
 
+  await model.estimate.create({
+    id: 1,
+    date: new Date(),
+    number: '20210517-001',
+    name: '株式会社ロレムイプサム',
+    title: '御中',
+    subscribe: '受け取る',
+    email: 'shelf@loremipsum.co.jp',
+    price: 22000,
+  })
+
   await model.product.create({
     id: 1,
     width: 15,
@@ -70,6 +81,12 @@ module.exports = async function () {
   await model.questionProduct.create({
     sort: 1,
     questionId: 1,
+    productId: 1,
+  })
+
+  await model.estimateProduct.create({
+    sort: 1,
+    estimateId: 1,
     productId: 1,
   })
 }

@@ -33,26 +33,28 @@ block main
               a(href='#order') 見積書発行履歴について
             li
               a(href='#list') 商品の内訳
-            li
-              a(href='#product1') 商品1について
+            each product of products
+              li
+                a(href='#product' + product.number) 商品#{product.number}の詳細
 
       section.mt-3(id='order')
         h2 見積書発行履歴について
         dl.mb-0
           dt 発行日時
-          dd 2021年5月4日(火) 9時0分0秒
+          dd #{estimate.dateText}
 
           dt 見積書番号
-          dd 1111-2222-3333
+          dd #{estimate.number}
 
           dt 宛名
-          dd 株式会社ロレムイプサム 御中
+          dd #{estimate.name}
 
           dt メールマガジン
-          dd 受け取る
+          dd #{estimate.subscribe}
 
-          dt メールアドレス
-          dd shelf@loremipsum.co.jp
+          if estimate.subscribe === '受け取る'
+            dt メールアドレス
+            dd #{estimate.email}
 
       section.mt-3(id='list')
         h2 商品の内訳
@@ -65,25 +67,27 @@ block main
               th 数量
               th 金額
           tbody
-            tr
-              td 商品1
-              td 20,000円
-              td 1台
-              td 20,000円
+            each product in products
+              tr
+                td 商品#{product.number}
+                td #{product.price.unitText}円
+                td #{product.amount}台
+                td #{product.price.totalText}円
 
         dl
           dt 小計金額（税抜）
-          dd 21,500円
+          dd #{summary.subtotalText}円
 
           dt 消費税（10％）
-          dd 2,150円
+          dd #{summary.taxText}円
 
           dt 合計金額（税込）
-          dd 23,650円
+          dd #{summary.totalText}円
 
           dt 合計数量
-          dd 1台
+          dd #{summary.amountText}台
 
-      section.mt-3(id='product1')
-        h2 商品1について
-        +product-item
+      each product of products
+        section.mt-3(id='product' + product.number)
+          h2 商品#{product.number}の詳細
+          +product-item(product)

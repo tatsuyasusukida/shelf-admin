@@ -71,11 +71,14 @@ class Converter {
 
   convertEstimate (estimate) {
     return {
+      id: estimate.id,
       date: estimate.date,
       dateText: this.convertDate(estimate.date),
       number: estimate.number,
       name: estimate.name,
       title: estimate.title,
+      price: estimate.price,
+      priceText: this.formatNumber(estimate.price),
     }
   }
 

@@ -56,6 +56,29 @@ class SummaryMaker {
       amountText: this.converter.formatNumber(amount),
     }
   }
+
+  async makeSummaryEstimate (estimate, products) {
+    const subtotal = products.reduce((memo, product) => {
+      return memo + product.price.total
+    }, 0)
+
+    const tax = Math.floor(subtotal * process.env.TAX_PERCENT / 100)
+    const total = subtotal + tax
+    const amount = products.reduce((memo, product) => {
+      return memo + parseInt(product.amount, 10)
+    }, 0)
+
+    return {
+      subtotal,
+      subtotalText: this.converter.formatNumber(subtotal),
+      tax,
+      taxText: this.converter.formatNumber(tax),
+      total,
+      totalText: this.converter.formatNumber(total),
+      amount,
+      amountText: this.converter.formatNumber(amount),
+    }
+  }
 }
 
 module.exports.SummaryMaker = SummaryMaker

@@ -6,6 +6,7 @@ module.exports = function (sequelize, DataTypes) {
     title: {type: DataTypes.STRING, allowNull: false},
     subscribe: {type: DataTypes.STRING, allowNull: false},
     email: {type: DataTypes.STRING, allowNull: false},
+    price: {type: DataTypes.INTEGER, allowNull: false},
   })
 
   return estimate

@@ -97,7 +97,10 @@ class App {
     this.router.get('/private/question/:questionId([0-9]+)/delete/', (req, res) => res.render('question/private-delete'))
     this.router.get('/private/question/delete/finish/', (req, res) => res.render('question/private-delete-finish'))
 
+    this.router.get('/private/estimate/', this.onRequestPrivateEstimateIndex.bind(this))
     this.router.get('/private/estimate/', (req, res) => res.render('estimate/private-index'))
+    this.router.use('/private/estimate/:estimateId([0-9]+)/', this.onRequestFindEstimate.bind(this))
+    this.router.get('/private/estimate/:estimateId([0-9]+)/', this.onRequestPrivateEstimateView.bind(this))
     this.router.get('/private/estimate/:estimateId([0-9]+)/', (req, res) => res.render('estimate/private-view'))
     this.router.get('/private/estimate/:estimateId([0-9]+)/print/', (req, res) => res.render('estimate/private-print'))
     this.router.get('/private/estimate/:estimateId([0-9]+)/delete/', (req, res) => res.render('estimate/private-delete'))
@@ -121,6 +124,10 @@ class App {
     this.router.use('/api/v1/private/question/:questionId([0-9]+)/', this.onRequestFindQuestion.bind(this))
     this.router.get('/api/v1/private/question/:questionId([0-9]+)/print/initialize', this.onRequestApiV1PrivateQuestionPrintInitialize.bind(this))
     this.router.delete('/api/v1/private/question/:questionId([0-9]+)/delete/submit', this.onRequestApiV1PrivateQuestionDeleteSubmit.bind(this))
+
+    this.router.use('/api/v1/private/estimate/:estimateId([0-9]+)/', this.onRequestFindEstimate.bind(this))
+    this.router.get('/api/v1/private/estimate/:estimateId([0-9]+)/print/initialize', this.onRequestApiV1PrivateEstimatePrintInitialize.bind(this))
+    this.router.delete('/api/v1/private/estimate/:estimateId([0-9]+)/delete/submit', this.onRequestApiV1PrivateEstimateDeleteSubmit.bind(this))
 
     this.router.use(this.onNotFound.bind(this))
     this.router.use(this.onInternalServerError.bind(this))
@@ -225,6 +232,26 @@ class App {
       }
 
       req.locals.question = question
+      next()
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async onRequestFindEstimate (req, res, next) {
+    try {
+      const estimate = await model.estimate.findOne({
+        where: {
+          id: {[Op.eq]: req.params.estimateId},
+        },
+      })
+
+      if (!estimate) {
+        res.status(404).end()
+        return
+      }
+
+      req.locals.estimate = estimate
       next()
     } catch (err) {
       next(err)
@@ -367,6 +394,72 @@ class App {
     }
   }
 
+  async onRequestPrivateEstimateIndex (req, res, next) {
+    try {
+      const current = parseInt(req.query.page || '1', 10)
+      const limit = 20
+      const offset = limit * (current - 1)
+      let where = {}
+
+      if (req.query.keyword) {
+        where = {
+          [Op.or]: {
+            number: {[Op.like]: `%${req.query.keyword}%`},
+            name: {[Op.like]: `%${req.query.keyword}%`},
+          },
+        }
+      }
+
+      const estimates = (await model.estimate.findAll({
+          where,
+          estimate: [['date', 'desc']],
+          limit,
+          offset,
+        }))
+        .map(estimate => {
+          return this.converter.convertEstimate(estimate)
+        })
+
+      const count = (await model.estimate.count({where}))
+      const page = this.paginator.makePage(count, limit, current)
+      const pagination = this.paginator.makePagination(req.query, page)
+
+      res.locals.estimates = estimates
+      res.locals.page = page
+      res.locals.pagination = pagination
+      next()
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async onRequestPrivateEstimateView (req, res, next) {
+    try {
+      const estimate = this.converter.convertEstimate(req.locals.estimate)
+      const products = (await model.estimateProduct.findAll({
+          where: {
+            estimateId: {[Op.eq]: estimate.id},
+          },
+          estimate: [['sort', 'asc']],
+          include: [model.product]
+        }))
+        .map(({product}, i) => {
+          return this.converter.convertProduct(product, i + 1)
+        })
+
+      const args = [estimate, products]
+      const summary = await this.summaryMaker.makeSummaryEstimate(...args)
+
+      res.locals.estimate = estimate
+      res.locals.products = products
+      res.locals.summary = summary
+
+      next()
+    } catch (err) {
+      next(err)
+    }
+  }
+
   async onRequestApiV1PublicIamSigninInitialize (req, res, next) {
     try {
       const form = this.initializer.makeFormIamSignin()
@@ -482,6 +575,42 @@ class App {
   async onRequestApiV1PrivateQuestionDeleteSubmit (req, res, next) {
     try {
       await req.locals.question.destroy()
+
+      const ok = true
+      const redirect = '../../delete/finish/'
+
+      res.send({ok, redirect})
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async onRequestApiV1PrivateEstimatePrintInitialize (req, res, next) {
+    try {
+      const estimate = this.converter.convertEstimate(req.locals.estimate)
+      const products = (await model.estimateProduct.findAll({
+          where: {
+            estimateId: {[Op.eq]: estimate.id},
+          },
+          estimate: [['sort', 'asc']],
+          include: [model.product]
+        }))
+        .map(({product}, i) => {
+          return this.converter.convertProduct(product, i + 1)
+        })
+
+      const args = [estimate, products]
+      const summary = await this.summaryMaker.makeSummaryEstimate(...args)
+
+      res.send({estimate, products, summary})
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async onRequestApiV1PrivateEstimateDeleteSubmit (req, res, next) {
+    try {
+      await req.locals.estimate.destroy()
 
       const ok = true
       const redirect = '../../delete/finish/'
