@@ -2,6 +2,7 @@ module.exports = function (sequelize, DataTypes) {
   const question = sequelize.define('question', {
     date: {type: DataTypes.DATE, allowNull: false},
     number: {type: DataTypes.STRING, allowNull: false},
+    category: {type: DataTypes.STRING, allowNull: false},
     name: {type: DataTypes.STRING, allowNull: false},
     kana: {type: DataTypes.STRING, allowNull: false},
     company: {type: DataTypes.STRING, allowNull: false},

@@ -33,6 +33,7 @@ module.exports = async function () {
     id: 1,
     date: new Date(),
     number: '1111-2222-3333',
+    category: '商品について',
     name: 'ここにお名前が入ります',
     kana: 'ここにフリガナが入ります',
     company: '株式会社ロレムイプサム',
