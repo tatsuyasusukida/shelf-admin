@@ -346,7 +346,7 @@ class App {
 
       const questions = (await model.question.findAll({
           where,
-          question: [['date', 'desc']],
+          order: [['date', 'desc']],
           limit,
           offset,
         }))
@@ -412,7 +412,7 @@ class App {
 
       const estimates = (await model.estimate.findAll({
           where,
-          estimate: [['date', 'desc']],
+          order: [['date', 'desc']],
           limit,
           offset,
         }))
