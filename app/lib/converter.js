@@ -1,5 +1,5 @@
-const {ImageMaker} = require('./image-maker')
-const {PriceCalculator} = require('./price-calculator')
+const {ImageMaker} = require('./ImageMaker')
+const {PriceCalculator} = require('./PriceCalculator')
 
 class Converter {
   constructor () {
@@ -34,6 +34,7 @@ class Converter {
       date: question.date,
       dateText: this.convertDateTime(question.date),
       number: question.number,
+      category: question.category,
       name: question.name,
       kana: question.kana,
       company: question.company,
@@ -73,10 +74,12 @@ class Converter {
     return {
       id: estimate.id,
       date: estimate.date,
-      dateText: this.convertDate(estimate.date),
+      dateText: this.convertDateTime(estimate.date),
       number: estimate.number,
       name: estimate.name,
       title: estimate.title,
+      subscribe: estimate.subscribe,
+      email: estimate.email,
       price: estimate.price,
       priceText: this.formatNumber(estimate.price),
     }

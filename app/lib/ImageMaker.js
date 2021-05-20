@@ -1,10 +1,13 @@
 const querystring = require('querystring')
-const {Initializer} = require('./initializer')
+const {Initializer} = require('./Initializer')
 
 class ImageMaker {
+  constructor () {
+    this.initializer = new Initializer()
+  }
+
   makeImage (product) {
-    const initializer = new Initializer()
-    const options = initializer.makeOptionsProductColor()
+    const options = this.initializer.makeOptionsProductColor()
     const map = options.reduce((memo, option) => {
       memo[option.value] = option.background
       return memo
@@ -19,7 +22,6 @@ class ImageMaker {
       fix: product.fix,
       back: product.back,
       color: product.color,
-      amount: product.amount,
       background: map[product.color]
     })
 

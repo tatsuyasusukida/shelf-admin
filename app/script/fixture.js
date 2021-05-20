@@ -1,6 +1,6 @@
 const model = require('../model')
 const winston = require('winston')
-const {LoggerMaker} = require('../util/logger-maker')
+const {LoggerMaker} = require('../util/LoggerMaker')
 const fixture = require('../test/fixture')
 
 class Main {

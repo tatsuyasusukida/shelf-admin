@@ -1,7 +1,7 @@
 const http = require('http')
 const winston = require('winston')
 const {App} = require('../app')
-const {LoggerMaker} = require('../util/logger-maker')
+const {LoggerMaker} = require('../util/LoggerMaker')
 
 class Main {
   async run () {

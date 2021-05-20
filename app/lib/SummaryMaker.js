@@ -1,4 +1,4 @@
-const {Converter} = require('./converter')
+const {Converter} = require('./Converter')
 
 class SummaryMaker {
   constructor () {

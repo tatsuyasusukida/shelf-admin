@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "nodemon -r dotenv/config script/serve.js",
-    "fixture": "node -r dotenv/config script/fixture.js"
+    "fixture": "node -r dotenv/config script/fixture.js",
+    "test": "node -r dotenv/config test/index.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
