@@ -1,8 +1,12 @@
 const bcrypt = require('bcryptjs')
 const model = require('../model')
-const {Op} = require('sequelize')
+const {Finder} = require('./Finder')
 
 class Validator {
+  constructor () {
+    this.finder = new Finder()
+  }
+
   makeValidationIamSignin () {
     return {
       ok: null,
@@ -36,11 +40,8 @@ class Validator {
   }
 
   async isAuthenticated (req) {
-    const admin = await model.admin.findOne({
-      where: {
-        username: {[Op.eq]: req.body.form.username},
-      },
-    })
+    const {form} = req.body
+    const admin = await this.finder.findAdminByUsername(form.username)
 
     if (!admin) {
       return false

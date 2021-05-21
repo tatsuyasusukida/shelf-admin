@@ -8,11 +8,8 @@ class SummaryMaker {
   async makeSummaryOrder (order, products) {
     const shipping = 0
     const fee = order.payment === '代金引換' ? 600 : 0
-    const subtotal = shipping + fee + products.reduce((memo, product) => {
-      return memo + product.price.total
-    }, 0)
-
-    const tax = Math.floor(subtotal * process.env.TAX_PERCENT / 100)
+    const subtotal = this.calculateSubtotal(products) + shipping + fee
+    const tax = this.calculateTax(subtotal)
     const total = subtotal + tax
     const amount = products.reduce((memo, product) => {
       return memo + parseInt(product.amount, 10)
@@ -35,11 +32,16 @@ class SummaryMaker {
   }
 
   async makeSummaryQuestion (question, products) {
-    const subtotal = products.reduce((memo, product) => {
-      return memo + product.price.total
-    }, 0)
+    return await this.makeSummaryBasic(products)
+  }
 
-    const tax = Math.floor(subtotal * process.env.TAX_PERCENT / 100)
+  async makeSummaryEstimate (estimate, products) {
+    return await this.makeSummaryBasic(products)
+  }
+
+  async makeSummaryBasic (products) {
+    const subtotal = this.calculateSubtotal(products)
+    const tax = this.calculateTax(subtotal)
     const total = subtotal + tax
     const amount = products.reduce((memo, product) => {
       return memo + parseInt(product.amount, 10)
@@ -57,27 +59,14 @@ class SummaryMaker {
     }
   }
 
-  async makeSummaryEstimate (estimate, products) {
-    const subtotal = products.reduce((memo, product) => {
+  calculateSubtotal (products) {
+    return products.reduce((memo, product) => {
       return memo + product.price.total
     }, 0)
+  }
 
-    const tax = Math.floor(subtotal * process.env.TAX_PERCENT / 100)
-    const total = subtotal + tax
-    const amount = products.reduce((memo, product) => {
-      return memo + parseInt(product.amount, 10)
-    }, 0)
-
-    return {
-      subtotal,
-      subtotalText: this.converter.formatNumber(subtotal),
-      tax,
-      taxText: this.converter.formatNumber(tax),
-      total,
-      totalText: this.converter.formatNumber(total),
-      amount,
-      amountText: this.converter.formatNumber(amount),
-    }
+  calculateTax (subtotal) {
+    return Math.floor(subtotal * process.env.TAX_PERCENT / 100)
   }
 }
 

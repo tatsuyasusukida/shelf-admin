@@ -1,97 +1,45 @@
 class PriceCalculator {
+  constructor () {
+    this.params = {
+      thicknessFrame: 30,
+      thicknessBack: 8,
+      materialLonger: 2000,
+      materialShorter: 600,
+    }
+  }
+
   calculatePrice (product) {
     const plates = []
-    const input = {
-      width: parseInt(product.width, 10) * 10,
-      height: parseInt(product.height, 10) * 10,
-      depth: parseInt(product.depth, 10) * 10,
-      row: parseInt(product.row, 10),
-      thickness: parseInt(product.thickness, 10),
-      amount: parseInt(product.amount, 10),
+    const input = this.makeInput(product)
+
+    for (let i = 0; i < 2; i += 1) {
+      plates.push(this.makePlateHorizontal(input, this.params))
+      plates.push(this.makePlateVertical(input, this.params))
     }
-
-    const thicknessFrame = 30
-    const thicknessBack = 8
-
-    const plateVertical = {
-      width: input.depth,
-      height: input.height,
-      thickness: thicknessFrame,
-    }
-
-    const plateHorizontal = {
-      width: input.width,
-      height: input.depth,
-      thickness: thicknessFrame,
-    }
-
-    const plateInner = {
-      width: input.width - thicknessFrame * 2,
-      height: input.depth - (product.back === 'あり' ? thicknessBack : 0),
-      thickness: input.thickness,
-    }
-
-    const plateBack = {
-      width: input.width,
-      height: input.height,
-      thickness: thicknessBack,
-    }
-
-    plates.push(plateVertical)
-    plates.push(plateVertical)
-    plates.push(plateHorizontal)
-    plates.push(plateHorizontal)
 
     for (let i = 0; i < input.row; i += 1) {
-      plates.push(plateInner)
+      plates.push(this.makePlateInner(input, this.params))
     }
 
     if (product.back === 'あり') {
-      plates.push(plateBack)
+      plates.push(this.makePlateBack(input, this.params))
     }
 
-    let discount
-
-    if (input.amount >= 15) {
-      discount = 50
-    } else if (input.amount >= 10) {
-      discount = 60
-    } else if (input.amount >= 5) {
-      discount = 70
-    } else if (input.amount >= 3) {
-      discount = 80
-    } else if (input.amount >= 2) {
-      discount = 90
-    } else if (input.amount >= 1) {
-      discount = 100
-    }
-
-    const unit = Math.floor(plates.map(plate => {
-        let price
-
-        if (plate.thickness === thicknessFrame) {
-          price = 10000 / (2000 * 600)
-        } else if (plate.thickness === 25) {
-          price = 5000 / (2000 * 600)
-        } else if (plate.thickness === 17) {
-          price = 2500 / (2000 * 600)
-        } else if (plate.thickness === thicknessBack) {
-          price = 1250 / (2000 * 600)
-        } else {
-          throw new Error(`invalid thickness: ${plate.thickness}`)
-        }
-
-        const plateWidth = Math.max(plate.width, plate.height)
-        const plateHeight = Math.min(plate.width, plate.height)
-        const materialWidth = 2000
-        const materialHeight = 600
-        const args = [plateWidth, plateHeight, materialWidth, materialHeight]
+    const sum = plates.map(plate => {
+        const {width, height, thickness} = plate
+        const materialPrice = this.findMaterialPrice(thickness, this.params)
+        const plateLonger = Math.max(width, height)
+        const plateShorter = Math.min(width, height)
+        const {materialLonger, materialShorter} = this.params
+        const args = [plateLonger, plateShorter, materialLonger, materialShorter]
         const size = this.calculateSize(...args)
 
-        return size.width * size.height * price
+        return size.longer * size.shorter * materialPrice
       })
-      .reduce((memo, price) => memo += price, 0) * discount / 100 / 100) * 100
+      .reduce((memo, price) => memo += price, 0)
 
+    const discount = this.findDiscount(input.amount)
+    const unit = Math.floor(sum * discount / 100 / 100) * 100
     const total = unit * input.amount
 
     return {
@@ -102,11 +50,93 @@ class PriceCalculator {
     }
   }
 
-  calculateSize (plateWidth, plateHeight, materialWidth, materialHeight) {
-    if (plateWidth > materialHeight || plateHeight > materialWidth / 2) {
-      return {width: materialWidth, height: materialHeight}
+  makeInput (product) {
+    return {
+      width: parseInt(product.width, 10) * 10,
+      height: parseInt(product.height, 10) * 10,
+      depth: parseInt(product.depth, 10) * 10,
+      row: parseInt(product.row, 10),
+      thickness: parseInt(product.thickness, 10),
+      fix: product.fix,
+      back: product.back,
+      color: product.color,
+      amount: parseInt(product.amount, 10),
+    }
+  }
+
+  makePlateVertical (input, params) {
+    return {
+      width: input.depth,
+      height: input.height,
+      thickness: params.thicknessFrame,
+    }
+  }
+
+  makePlateHorizontal (input, params) {
+    return {
+      width: input.width,
+      height: input.depth,
+      thickness: params.thicknessFrame,
+    }
+  }
+
+  makePlateInner (input, params) {
+    return {
+      width: input.width - params.thicknessFrame * 2,
+      height: input.depth - (input.back === 'あり' ? params.thicknessBack : 0),
+      thickness: input.thickness,
+    }
+  }
+
+  makePlateBack (input, params) {
+    return {
+      width: input.width,
+      height: input.height,
+      thickness: params.thicknessBack,
+    }
+  }
+
+  findDiscount (amount) {
+    if (amount >= 15) {
+      return 50
+    } else if (amount >= 10) {
+      return 60
+    } else if (amount >= 5) {
+      return 70
+    } else if (amount >= 3) {
+      return 80
+    } else if (amount >= 2) {
+      return 90
+    } else if (amount >= 1) {
+      return 100
     } else {
-      return this.calculateSize(plateWidth, plateHeight, materialHeight, materialWidth / 2)
+      throw new TypeError(`invalid amount: ${amount}`)
+    }
+  }
+
+  findMaterialPrice (thickness, params) {
+    if (thickness === params.thicknessFrame) {
+      return 10000 / (2000 * 600)
+    } else if (thickness === 25) {
+      return 5000 / (2000 * 600)
+    } else if (thickness === 17) {
+      return 2500 / (2000 * 600)
+    } else if (thickness === params.thicknessBack) {
+      return 1250 / (2000 * 600)
+    } else {
+      throw new Error(`invalid thickness: ${thickness}`)
+    }
+  }
+
+  calculateSize (plateLonger, plateShorter, materialLonger, materialShorter) {
+    if (plateLonger > materialShorter || plateShorter > materialLonger / 2) {
+      return {longer: materialLonger, shorter: materialShorter}
+    } else {
+      if (materialLonger / 2 >= materialShorter) {
+        return this.calculateSize(plateLonger, plateShorter, materialLonger / 2, materialShorter)
+      } else {
+        return this.calculateSize(plateLonger, plateShorter, materialShorter, materialLonger / 2)
+      }
     }
   }
 }
