@@ -1,6 +1,7 @@
 const {ConverterTest} = require('../lib/ConverterTest')
 const {ImageMakerTest} = require('../lib/ImageMakerTest')
 const {InitializerTest} = require('../lib/InitializerTest')
+const {PaginatorTest} = require('../lib/PaginatorTest')
 
 class Main {
   async run () {
@@ -8,6 +9,7 @@ class Main {
       new ConverterTest(),
       new ImageMakerTest(),
       new InitializerTest(),
+      new PaginatorTest(),
     ]
 
     for (const testcase of testcases) {

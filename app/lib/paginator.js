@@ -78,12 +78,12 @@ class Paginator {
     const pagination = {
       previous: {
         isActive: page.current > page.min,
-        href: search + '&page=' + (page.current - 1)
+        href: search + '&page=' + (page.current - 1),
       },
       pages: pages,
       next: {
         isActive: page.current < page.max,
-        href: search + '&page=' + (page.current + 1)
+        href: search + '&page=' + (page.current + 1),
       },
     }
 
