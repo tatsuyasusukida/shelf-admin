@@ -8,16 +8,16 @@ const express = require('express')
 const session = require('express-session')
 const proxyMiddleware = require('proxy-middleware')
 const MySQLStore = require('express-mysql-session')(session)
+const {Finder} = require('./lib/Finder')
 const {Converter} = require('./lib/Converter')
 const {Paginator} = require('./lib/Paginator')
 const {Validator} = require('./lib/Validator')
 const {Initializer} = require('./lib/Initializer')
 const {SummaryMaker} = require('./lib/SummaryMaker')
-const model = require('./model')
-const {Op} = require('sequelize')
 
 class App {
   constructor () {
+    this.finder = new Finder()
     this.converter = new Converter()
     this.paginator = new Paginator()
     this.validator = new Validator()
@@ -184,15 +184,7 @@ class App {
     const {adminId} = req.session
 
     if (adminId) {
-      const admin = await model.admin.findOne({
-        where: {
-          id: {[Op.eq]: adminId},
-        },
-      })
-
-      if (admin) {
-        return admin
-      }
+      return await this.finder.findAdmin(adminId)
     }
 
     return null
@@ -200,11 +192,7 @@ class App {
 
   async onRequestFindOrder (req, res, next) {
     try {
-      const order = await model.order.findOne({
-        where: {
-          id: {[Op.eq]: req.params.orderId},
-        },
-      })
+      const order = await this.finder.findOrder(req.params.orderId)
 
       if (!order) {
         res.status(404).end()
@@ -220,11 +208,7 @@ class App {
 
   async onRequestFindQuestion (req, res, next) {
     try {
-      const question = await model.question.findOne({
-        where: {
-          id: {[Op.eq]: req.params.questionId},
-        },
-      })
+      const question = await this.finder.findQuestion(req.params.questionId)
 
       if (!question) {
         res.status(404).end()
@@ -240,11 +224,7 @@ class App {
 
   async onRequestFindEstimate (req, res, next) {
     try {
-      const estimate = await model.estimate.findOne({
-        where: {
-          id: {[Op.eq]: req.params.estimateId},
-        },
-      })
+      const estimate = await this.finder.findEstimate(req.params.estimateId)
 
       if (!estimate) {
         res.status(404).end()
@@ -262,31 +242,13 @@ class App {
     try {
       const current = parseInt(req.query.page || '1', 10)
       const limit = 20
-      const offset = limit * (current - 1)
-      let where = {}
-
-      if (req.query.keyword) {
-        where = {
-          [Op.or]: {
-            number: {[Op.like]: `%${req.query.keyword}%`},
-            name: {[Op.like]: `%${req.query.keyword}%`},
-            kana: {[Op.like]: `%${req.query.keyword}%`},
-            company: {[Op.like]: `%${req.query.keyword}%`},
-          },
-        }
-      }
-
-      const orders = (await model.order.findAll({
-          where,
-          order: [['date', 'desc']],
-          limit,
-          offset,
-        }))
+      const {query} = req
+      const orders = (await this.finder.findOrders(current, limit, query))
         .map(order => {
           return this.converter.convertOrder(order)
         })
 
-      const count = (await model.order.count({where}))
+      const count = await this.finder.countOrders(query)
       const page = this.paginator.makePage(count, limit, current)
       const pagination = this.paginator.makePagination(req.query, page)
 
@@ -302,13 +264,7 @@ class App {
   async onRequestPrivateOrderView (req, res, next) {
     try {
       const order = this.converter.convertOrder(req.locals.order)
-      const products = (await model.orderProduct.findAll({
-          where: {
-            orderId: {[Op.eq]: order.id},
-          },
-          order: [['sort', 'asc']],
-          include: [model.product]
-        }))
+      const products = (await this.finder.findOrderProducts(order.id))
         .map(({product}, i) => {
           return this.converter.convertProduct(product, i + 1)
         })
@@ -330,31 +286,13 @@ class App {
     try {
       const current = parseInt(req.query.page || '1', 10)
       const limit = 20
-      const offset = limit * (current - 1)
-      let where = {}
-
-      if (req.query.keyword) {
-        where = {
-          [Op.or]: {
-            number: {[Op.like]: `%${req.query.keyword}%`},
-            name: {[Op.like]: `%${req.query.keyword}%`},
-            kana: {[Op.like]: `%${req.query.keyword}%`},
-            company: {[Op.like]: `%${req.query.keyword}%`},
-          },
-        }
-      }
-
-      const questions = (await model.question.findAll({
-          where,
-          order: [['date', 'desc']],
-          limit,
-          offset,
-        }))
+      const {query} = req
+      const questions = (await this.finder.findQuestions(current, limit, query))
         .map(question => {
           return this.converter.convertQuestion(question)
         })
 
-      const count = (await model.question.count({where}))
+      const count = await this.finder.countQuestions(query)
       const page = this.paginator.makePage(count, limit, current)
       const pagination = this.paginator.makePagination(req.query, page)
 
@@ -370,13 +308,7 @@ class App {
   async onRequestPrivateQuestionView (req, res, next) {
     try {
       const question = this.converter.convertQuestion(req.locals.question)
-      const products = (await model.questionProduct.findAll({
-          where: {
-            questionId: {[Op.eq]: question.id},
-          },
-          question: [['sort', 'asc']],
-          include: [model.product]
-        }))
+      const products = (await this.finder.findQuestionProducts(question.id))
         .map(({product}, i) => {
           return this.converter.convertProduct(product, i + 1)
         })
@@ -398,29 +330,13 @@ class App {
     try {
       const current = parseInt(req.query.page || '1', 10)
       const limit = 20
-      const offset = limit * (current - 1)
-      let where = {}
-
-      if (req.query.keyword) {
-        where = {
-          [Op.or]: {
-            number: {[Op.like]: `%${req.query.keyword}%`},
-            name: {[Op.like]: `%${req.query.keyword}%`},
-          },
-        }
-      }
-
-      const estimates = (await model.estimate.findAll({
-          where,
-          order: [['date', 'desc']],
-          limit,
-          offset,
-        }))
+      const {query} = req
+      const estimates = (await this.finder.findEstimates(current, limit, query))
         .map(estimate => {
           return this.converter.convertEstimate(estimate)
         })
 
-      const count = (await model.estimate.count({where}))
+      const count = await this.finder.countEstimates(query)
       const page = this.paginator.makePage(count, limit, current)
       const pagination = this.paginator.makePagination(req.query, page)
 
@@ -436,13 +352,7 @@ class App {
   async onRequestPrivateEstimateView (req, res, next) {
     try {
       const estimate = this.converter.convertEstimate(req.locals.estimate)
-      const products = (await model.estimateProduct.findAll({
-          where: {
-            estimateId: {[Op.eq]: estimate.id},
-          },
-          estimate: [['sort', 'asc']],
-          include: [model.product]
-        }))
+      const products = (await this.finder.findEstimateProducts(estimate.id))
         .map(({product}, i) => {
           return this.converter.convertProduct(product, i + 1)
         })
@@ -490,11 +400,8 @@ class App {
         return
       }
 
-      const admin = await model.admin.findOne({
-        where: {
-          username: {[Op.eq]: req.body.form.username},
-        },
-      })
+      const {username} = req.body.form
+      const admin = await this.finder.findAdminByUsername(username)
 
       const ok = true
       const redirect = '../../../private/'
@@ -522,13 +429,7 @@ class App {
   async onRequestApiV1PrivateOrderPrintInitialize (req, res, next) {
     try {
       const order = this.converter.convertOrder(req.locals.order)
-      const products = (await model.orderProduct.findAll({
-          where: {
-            orderId: {[Op.eq]: order.id},
-          },
-          order: [['sort', 'asc']],
-          include: [model.product]
-        }))
+      const products = (await this.finder.findOrderProducts(order.id))
         .map(({product}, i) => {
           return this.converter.convertProduct(product, i + 1)
         })
@@ -555,13 +456,7 @@ class App {
   async onRequestApiV1PrivateQuestionPrintInitialize (req, res, next) {
     try {
       const question = this.converter.convertQuestion(req.locals.question)
-      const products = (await model.questionProduct.findAll({
-          where: {
-            questionId: {[Op.eq]: question.id},
-          },
-          question: [['sort', 'asc']],
-          include: [model.product]
-        }))
+      const products = (await this.finder.findQuestionProducts(question.id))
         .map(({product}, i) => {
           return this.converter.convertProduct(product, i + 1)
         })
@@ -588,13 +483,7 @@ class App {
   async onRequestApiV1PrivateEstimatePrintInitialize (req, res, next) {
     try {
       const estimate = this.converter.convertEstimate(req.locals.estimate)
-      const products = (await model.estimateProduct.findAll({
-          where: {
-            estimateId: {[Op.eq]: estimate.id},
-          },
-          estimate: [['sort', 'asc']],
-          include: [model.product]
-        }))
+      const products = (await this.finder.findEstimateProducts(estimate.id))
         .map(({product}, i) => {
           return this.converter.convertProduct(product, i + 1)
         })
