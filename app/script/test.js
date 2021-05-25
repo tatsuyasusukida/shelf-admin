@@ -5,6 +5,9 @@ const {PaginatorTest} = require('../lib/PaginatorTest')
 const {PriceCalculatorTest} = require('../lib/PriceCalculatorTest')
 const {SummaryMakerTest} = require('../lib/SummaryMakerTest')
 const {ValidatorTest} = require('../lib/ValidatorTest')
+const {AppTest} = require('../test/AppTest')
+const {ApiTest} = require('../test/ApiTest')
+const {UiTest} = require('../test/UiTest')
 
 class Main {
   async run () {
@@ -16,6 +19,9 @@ class Main {
       new PriceCalculatorTest(),
       new SummaryMakerTest(),
       new ValidatorTest(),
+      new AppTest(),
+      new ApiTest(),
+      new UiTest(),
     ]
 
     for (const testcase of testcases) {
