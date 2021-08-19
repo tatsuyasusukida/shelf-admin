@@ -6,7 +6,15 @@
   "scripts": {
     "start": "nodemon -r dotenv/config script/serve.js",
     "fixture": "node -r dotenv/config script/fixture.js",
-    "test": "npm run fixture && node -r dotenv/config script/test.js"
+    "test": "npm run fixture && node -r dotenv/config script/test.js",
+    "activate": "gcloud config configurations activate default",
+    "image": "echo gcr.io/`gcloud config get-value project`/shelf-admin:latest",
+    "build": "rm -rf static && cp -r ../static/dist static && docker image build -t shelf-admin:latest .",
+    "tag": "docker image tag shelf-admin:latest `npm run -s image`",
+    "push": "docker image push `npm run -s image`",
+    "deploy": "gcloud run deploy shelf-admin --image `npm run -s image` --platform managed --region asia-northeast1",
+    "staging": "npm run activate && npm run build && npm run tag && npm run push && npm run deploy",
+    "dump": "mysqldump -u root shelf > dump.sql"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

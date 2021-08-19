@@ -12,6 +12,9 @@ const config = {
   database: process.env.DB_DATABASE,
   host: process.env.DB_HOST,
   dialect: process.env.DB_DIALECT,
+  dialectOptions: {
+    socketPath: process.env.DB_SOCKET,
+  },
   logging: message => winston.loggers.get('query').info(message),
   logQueryParameters: true
 };

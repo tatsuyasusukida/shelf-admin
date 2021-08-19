@@ -30,6 +30,10 @@ class Main {
       email: 'shelf@loremipsum.co.jp',
     })
 
+    if (process.env.ONLY_ADMIN === '1') {
+      return
+    }
+
     await model.order.create({
       id: 1,
       date: new Date(),
