@@ -182,6 +182,10 @@ class App {
   }
 
   async authenticate (req) {
+    if (process.env.DEMO_IS_ENABLED === '1') {
+      return {}
+    }
+
     const {adminId} = req.session
 
     if (adminId) {
