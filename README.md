@@ -1,6 +1,6 @@
-# Shelf Public
+# Shelf Admin
 
-Shelf Public is an online shopping system.
+Shelf Admin is an online shopping system.
 The user can order Semi-custom made book shelf.
 
 
@@ -10,8 +10,8 @@ The user can order Semi-custom made book shelf.
 Open a terminal and run the following commands.
 
 ```shell
-git clone https://github.com/tatsuyasusukida/shelf-public.git
-cd shelf-public/app
+git clone https://github.com/tatsuyasusukida/shelf-admin.git
+cd shelf-admin/app
 npm install
 cd ../static
 npm install
@@ -35,7 +35,7 @@ cd ../static
 npm start
 ```
 
-Access http://localhost:3000/
+Access http://localhost:3001/
 
 
 
