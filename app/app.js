@@ -44,6 +44,12 @@ class App {
         password: process.env.STORE_PASSWORD,
         database: process.env.STORE_DATABASE,
         socketPath: process.env.STORE_SOCKET,
+        schema: {
+          tableName: process.env.STORE_TABLE,
+        },
+        ssl: process.env.STORE_IS_SSL === '1' ? {
+          rejectUnauthorized: true,
+        } : false,
       }),
     })
 

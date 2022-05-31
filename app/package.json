@@ -8,6 +8,8 @@
     "dev": "nodemon -r dotenv/config script/serve.js",
     "fixture": "node -r dotenv/config script/fixture.js",
     "test": "npm run fixture && node -r dotenv/config script/test.js",
+    "deploy2": "gcloud run deploy shelf-admin --source . --region asia-northeast1 --platform managed --allow-unauthenticated",
+
     "activate": "gcloud config configurations activate default",
     "image": "echo gcr.io/`gcloud config get-value project`/shelf-admin:latest",
     "build": "rm -rf static && cp -r ../static/dist static && docker image build -t shelf-admin:latest .",
@@ -35,5 +37,8 @@
   "devDependencies": {
     "node-fetch": "^2.6.1",
     "puppeteer": "^9.1.1"
+  },
+  "engines": {
+    "node": "16"
   }
 }
