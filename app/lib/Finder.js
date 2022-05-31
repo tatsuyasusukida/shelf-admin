@@ -80,14 +80,15 @@ class Finder {
   }
 
   async findOrderProducts (orderId, transaction) {
-     return await model.orderProduct.findAll({
-      where: {
-        orderId: {[Op.eq]: orderId},
-      },
-      order: [['sort', 'asc']],
-      include: [model.product],
-      transaction,
-    })
+    return (await model.orderProduct.findAll({
+        where: {
+          orderId: {[Op.eq]: orderId},
+        },
+        order: [['sort', 'asc']],
+        include: [{model: model.product, as: 'product'}],
+        transaction,
+      }))
+      .filter(({product}) => product !== null)
   }
 
   async findQuestions (current, limit, query, transaction) {
@@ -123,14 +124,15 @@ class Finder {
   }
 
   async findQuestionProducts (questionId, transaction) {
-     return await model.questionProduct.findAll({
-      where: {
-        questionId: {[Op.eq]: questionId},
-      },
-      order: [['sort', 'asc']],
-      include: [model.product],
-      transaction,
-    })
+     return (await model.questionProduct.findAll({
+         where: {
+           questionId: {[Op.eq]: questionId},
+         },
+         order: [['sort', 'asc']],
+         include: [{model: model.product, as: 'product'}],
+         transaction,
+       }))
+      .filter(({product}) => product !== null)
   }
 
   async findEstimates (current, limit, query, transaction) {
@@ -164,14 +166,15 @@ class Finder {
   }
 
   async findEstimateProducts (estimateId, transaction) {
-     return await model.estimateProduct.findAll({
-      where: {
-        estimateId: {[Op.eq]: estimateId},
-      },
-      order: [['sort', 'asc']],
-      include: [model.product],
-      transaction,
-    })
+    return (await model.estimateProduct.findAll({
+        where: {
+          estimateId: {[Op.eq]: estimateId},
+        },
+        order: [['sort', 'asc']],
+        include: [{model: model.product, as: 'product'}],
+        transaction,
+      }))
+      .filter(({product}) => product !== null)
   }
 }
 

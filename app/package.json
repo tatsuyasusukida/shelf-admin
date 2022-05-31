@@ -4,7 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon -r dotenv/config script/serve.js",
+    "start": "node script/serve.js",
+    "dev": "nodemon -r dotenv/config script/serve.js",
     "fixture": "node -r dotenv/config script/fixture.js",
     "test": "npm run fixture && node -r dotenv/config script/test.js",
     "activate": "gcloud config configurations activate default",
